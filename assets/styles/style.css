@@ -1,0 +1,77 @@
+/* Sticky footer styles
+-------------------------------------------------- */
+html {
+  position: relative;
+  min-height: 100%;
+}
+body {
+  /* Margin bottom by footer height */
+  margin-bottom: 60px;
+}
+body, input, a, h1, h2, h3, p {
+ font-family: 'Open Sans', sans-serif;	
+}
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  /* Set the fixed height of the footer here */
+  height: 60px;
+  background-color: #f5f5f5;
+}
+
+
+/* Custom page CSS
+-------------------------------------------------- */
+/* Not required for template or sticky footer method. */
+
+body > .container {
+  padding: 60px 15px 0;
+}
+.container .text-muted {
+  margin: 20px 0;
+}
+
+.footer > .container {
+  padding-right: 15px;
+  padding-left: 15px;
+}
+
+code {
+  font-size: 80%;
+}
+
+.navbar-brand img {
+  margin-top: -5px;
+  vertical-align: center;
+}
+
+.navbar-static-top {
+  margin-bottom: 19px;
+}
+
+.login-input-div {
+  margin-bottom: 5px;
+}
+
+.login-fb {
+  margin-top: 5px;
+  text-align: center;
+}
+
+#user-pic {
+  padding: 10px 35px 10px 35px;
+  margin: 10px -10px 0 0;
+  background-size: 60%;
+  background-repeat: no-repeat;  
+}
+
+.main-area {
+  padding-top: 0px;
+  margin-top: -50px;
+}
+
+.navbar-static-top {
+	margin-bottom: 0px;
+}
+

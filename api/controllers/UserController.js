@@ -5,45 +5,28 @@
  * @help        :: See http://links.sailsjs.org/docs/controllers
  */
 
-var passport = require('passport');
-
 module.exports = {
+  validate: function(req, res) {
+  	var data = {};
+  	
+  	for (var i in req.body) {
+			var values = req.body[i].split(',');
+  		data[i] = values;
+  	}
 
-  login: function (req, res) {
-    res.view();
-  },
+  	if (data) {
+	  	User.find(data, function(err, users) {
 
-  dashboard: function (req, res) {
-    res.view();
-  },
-
-  logout: function (req, res){
-    req.session.user = null;
-    req.session.flash = 'You have logged out';
-    res.redirect('user/login');
-  },
-
-  'facebook': function (req, res, next) {
-     passport.authenticate('facebook', { scope: ['email', 'user_about_me']},
-        function (err, user) {
-            req.logIn(user, function (err) {
-            if(err) {
-                req.session.flash = 'There was an error';
-                res.redirect('user/login');
-            } else {
-                req.session.user = user;
-                res.redirect('/user/dashboard');
-            }
-        });
-    })(req, res, next);
-  },
-
-  'facebook/callback': function (req, res, next) {
-     passport.authenticate('facebook',
-        function (req, res) {
-            res.redirect('/user/dashboard');
-        })(req, res, next);
+				for (var i=0; i<users.length; i++) {
+						for (var key in users[i]) {
+							if (data.hasOwnProperty(key)) 
+								data[key].splice(data[key].indexOf(users[i][key]),1);
+						}
+				}
+				
+				res.send(data);
+			
+			});
+  	}
   }
-
-};
-
+}

@@ -8,7 +8,13 @@
 module.exports = {
 
   attributes: {
-
+  	url: { type: 'string' },
+  	title: { type: 'string' },
+  	favicon: { type: 'string' },
+  	views: { type: 'integer', defaultsTo: 0 },
+  	position: { type: 'integer', defaultsTo: 0 },
+  	user: { model: 'user' }
   }
+
 };
 

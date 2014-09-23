@@ -59,6 +59,7 @@ code {
   text-align: center;
 }
 
+
 #user-pic {
   padding: 10px 35px 10px 35px;
   margin: 10px -10px 0 0;
@@ -71,7 +72,104 @@ code {
   margin-top: -50px;
 }
 
+.main-nav {
+  border-bottom: 1px solid #DDD;
+  margin: 20px 0 10px 0;
+  padding: 0px 30px 5px 5px;
+}
+
+.main-nav-right {
+  text-align: right;
+}
+
 .navbar-static-top {
 	margin-bottom: 0px;
 }
 
+.link-list {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+  width: 100%;
+}
+
+#sortable li {
+  margin: 10px;
+  padding: 0px;
+  float: left;
+  text-align: center;
+  cursor: pointer;
+  width: 165px;
+  height: 124px;  
+}
+
+.link-item {
+  height: 124px;
+}
+
+.link-bg {
+  padding: 0;
+  margin: 0px;
+  width: 165px;
+  height: 124px;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  border-radius: 10px;
+  border: 2px solid #DFDFDF;
+}
+
+.link-overlay {
+  background-color: rgba(255, 255, 255, 0.9);
+  -webkit-border-radius: 8px;
+  -moz-border-radius: 8px;
+  border-radius: 8px;
+  width: 100%;
+  height: 100%;
+}
+
+.link-favicon {
+  padding: 8px 0 0 0px;
+  height: 20px;
+}
+
+.link-bottom {
+  color: #888;
+  padding: 3px 5px;
+  font-size: 12px;
+}
+
+.link-views, .link-views-text, .link-views-icon {
+  float: left;
+}
+
+.link-saves {
+  float: right;
+}
+
+.link-views-icon, .glyphicon-bookmark {
+  padding-top: 2px;
+}
+
+.link-views-text {
+  padding-left: 5px;
+}
+
+.link-title {
+  font-size: 13px;
+  font-weight: 600;
+  margin: 0px 0px 0px 0px;
+  padding: 7px 3px;
+}
+
+.link-url {
+  margin-top: 55px;
+  color: #999;
+}
+
+
+.highlight {
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  border-radius: 10px;  
+  border: 4px dashed #BBB;
+}

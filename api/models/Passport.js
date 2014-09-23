@@ -74,7 +74,7 @@ var Passport = {
    * @param {Object}   passport The soon-to-be-created Passport
    * @param {Function} next
    */
-  beforeCreate: function (passport, next) {
+  beforeCreate: function (passport, next) {     
     if (passport.hasOwnProperty('password')) {
       bcrypt.hash(passport.password, 10, function (err, hash) {
         passport.password = hash;

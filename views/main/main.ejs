@@ -1,23 +1,50 @@
+    <!-- Begin page content -->
     <div class="container main-area">
     	<div class="row">
-			<div class="col-md-3">
-				
-			</div>
-			<div class="col-md-7">
-				<form role="form" id="link-form"> 
-					<div class="input-group input-group-lg">
-						<input type="text" class="form-control" id="link-input" placeholder="Enter or Copy/Paste a URL">
-						<span class="input-group-btn">
-							<button class="btn btn-primary" type="submit">Add</button>
-						</span>
-					</div>
-				</form>
-				
-				<div class="links-area">
-					<ul id="sortable">
-						
-					</ul>
+				<div class="col-md-2">
+					
 				</div>
-			</div>
-		</div>	
+				<div class="col-md-10">
+					<div class="link-input-area">
+						<form role="form" id="link-form"> 
+							<div class="input-group input-group-lg">
+								<input type="text" class="form-control" id="link-input" placeholder="Enter or Copy/Paste a URL">
+								<span class="input-group-btn">
+									<button class="btn btn-primary" type="submit">Add</button>
+								</span>
+							</div>
+						</form>
+					</div>
+					<div class="row main-nav">
+						<div class="main-nav-left col-md-6">
+							<a href="#" id="icon-reorder"><span class="glyphicon glyphicon-th"></span>&nbsp;Reorder Links <b>[<span id="icon-reorder-onoff">Off</span>]</b></a>
+						</div>
+						<div class="main-nav-right col-md-6">
+							<span class="glyphicon glyphicon-sort-by-attributes"></span>&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-sort-by-attributes-alt"></span>&nbsp;&nbsp;&nbsp;Title							
+						</div>
+					</div>
+					<div class="navigation">
+						<a href="#"></a>
+					</div>					
+					<div class="link-area">
+						<ul id="sortable" class="link-list">
+							<% links.forEach(function(link) { %>		
+								<li id="link-<%= link.id %>">						
+									<span class="link-href" style="display: none"><%= link.url %></span>
+									<div class="link-item">
+										<div class="link-top"><img src="<%= link.favicon %>"></div>
+										<div class="link-bg" style="background-image: url('webshots/<%= link.id %>.jpg'); background-size: 165px 124px">
+											<div class="link-overlay">
+												<div class="link-favicon"><img src="<%= link.favicon %>"></div>
+												<h3 class="link-title"><%= link.title %><br /></h3>
+											</div>
+										</div>
+										<div class="link-bottom"><div class="link-views-icon"><span class="glyphicon glyphicon-eye-open"></div><div class="link-views-text"><%= link.views %></div><div class="link-saves"><span class="glyphicon glyphicon-bookmark"></span</div></div>
+									</div>
+								</li>
+							<% }); %>
+						</ul>
+					</div>
+				</div>
+			</div>	
     </div>

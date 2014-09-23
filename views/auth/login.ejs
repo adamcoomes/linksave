@@ -1,0 +1,8 @@
+    <form role="form" action="/auth/local" method="post">
+        <input type="text" name="identifier" placeholder="Username or Email">
+        <input type="password" name="password" placeholder="Password">
+        <input type="hidden" name="_csrf" value="<%= _csrf %>" />    
+        <button type="submit">Sign in</button>
+      </form>
+
+    <a href="/auth/facebook" role="button">facebook</a>

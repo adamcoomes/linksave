@@ -1,0 +1,13 @@
+								<li id="link-<%= link.id %>">
+									<span class="link-info" style="display: none"><%= link.info.id %></span>										
+									<span class="link-href" style="display: none"><%= link.info.url %></span>
+									<div class="link-item">
+										<div class="link-bg" style="background-image: url('webshots/<% if (typeof defaultImage !== 'undefined') { %>default.jpg<% } else { %><%= link.info.id %>.jpg<% } %>'); background-size: 165px 124px">
+											<div class="link-overlay">
+												<div class="link-favicon"><img src="<%= link.info.favicon %>"></div>
+												<h3 class="link-title"><%= link.title %><br /></h3>
+											</div>
+										</div>
+										<div class="link-bottom"><div class="link-views-icon"><span class="glyphicon glyphicon-eye-open"></div><div class="link-views-text"><%= link.views %></div><div class="link-saves"><span class="glyphicon glyphicon-bookmark"></span</div></div>
+									</div>
+								</li>

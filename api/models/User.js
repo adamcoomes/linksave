@@ -13,7 +13,11 @@ module.exports = {
   attributes: {
     username: { type: 'string', unique: true },
     email: { type: 'email',  unique: true },
+    photo: { type: 'string' },
+    first_name: { type: 'string' },
+    last_name: { type: 'string' },
     links: { collection: 'link', via: 'user' },
+    tags: { collection: 'tag', via: 'user' },    
     passports: { collection: 'Passport', via: 'user' }
   }
 };

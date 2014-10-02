@@ -69,6 +69,7 @@ passport.connect = function (req, query, profile, next) {
 
   // Set the authentication provider.
   query.provider = req.param('provider');
+  console.log(JSON.stringify(profile));
 
   // If the profile object contains a list of emails, grab the first one and
   // add it to the user.
@@ -92,6 +93,18 @@ passport.connect = function (req, query, profile, next) {
   , identifier : query.identifier.toString()
   }, function (err, passport) {
     if (err) return next(err);
+
+    var profileJSON = profile._json;
+
+    if (profileJSON.picture.data.url)
+      user.photo = profileJSON.picture.data.url
+
+    if (profileJSON.name) {
+      var fullname = profileJSON.name.split(' ');
+      user.first_name = fullname[0];
+      user.last_name = fullname[1];
+      user.username = fullname[0].toLowerCase() + profileJSON.id;
+    }
 
     if (!req.user) {
       // Scenario: A new user is attempting to sign up using a third-party

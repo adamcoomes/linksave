@@ -7,38 +7,67 @@
 
 var webpageinfo = require("webpage-info");
 var webshot = require('webshot');
+var fs = require('fs');
 
 module.exports = {
 	
 	add: function(req, res) {
 
 		var link = new Object();
-		link.url = req.query.url;
+		var data = new Object();
+		var url = req.query.url;
 		link.user = req.user;
 
-		webpageinfo.parse(link.url, function(info) {
-			if (info.error) {
-				link.title = link.url;
-				link.favicon = '';
-			} else {
-				link.title = info.title;
-				link.favicon = info.favicon;
-			}
+		var lastChar = url.length - 1;
+		if(url.lastIndexOf('/') === lastChar)
+    	url = url.substring(0, lastChar);		
 
-			Link.find({ where: { user: req.user.id }, sort: 'position ASC' }, function(err, eachlink) {
-				for (var i=0; i<eachlink.length; i++) {
-					Link.update({ id: eachlink[i] }, { position: (i+1) });
-				}
-			});
+		data.url = url;
+
+    function addLink(link, info) {
+    	link.title = info.title;
+    	link.info = info;
+
 
 			Link.create(link, function (err, newlink) {				
 				if (err)
 					res.send(err);
-				else
+				else {
+					newlink.info = info;
+					newlink.info.id = link.info;
   				res.send(newlink);
+				}
 			});
 
-		}, 3000);
+    };
+
+		Linkdata.findOne({url: url}).exec(function(err, foundData) {
+			if (foundData) {
+				addLink(link, foundData);
+			}
+			else {
+				webpageinfo.parse(url, function(webdata) {
+					if (webdata.error) {
+						data.title = url;
+						data.favicon = '';
+					} else {
+						data.title = webdata.title;
+						data.favicon = webdata.favicon;
+					}
+
+					Linkdata.create(data);
+					addLink(link, data);
+				
+				}, 3000);
+			}
+		});
+			
+			// Link.find({ where: { user: req.user.id }, sort: 'position ASC' }, function(err, eachlink) {
+			// 	for (var i=0; i<eachlink.length; i++) {
+			// 		Link.update({ id: eachlink[i] }, { position: (i+1) });
+			// 	}
+			// });
+
 	},
 
 	webshot: function(req, res) {
@@ -52,33 +81,58 @@ module.exports = {
 		var shotFile = 'webshots/' + id + '.' + ext;
 		var shotPath = assets + shotFile;
 
-		webshot(url, shotPath, {windowSize: {width: 640, height: 480}, shotSize: {width: 640, height: 480}}, function(err) {
-			setTimeout(function(){ 
-	  		if (err)
-					res.send('error');
-				else
-	  			res.send(shotFile);
-			}, 2000);
-		});
+		fs.exists(shotPath, function(exists) {
+  		if (exists)
+    		res.send(shotFile);
+    	else {
+				webshot(url, shotPath, {windowSize: {width: 640, height: 480}, shotSize: {width: 640, height: 480}}, function(err) {
+					setTimeout(function(){ 
+			  		if (err)
+							res.send('error');
+						else
+			  			res.send(shotFile);
+					}, 2000);
+				});
+    	}
+		});		
 	},
 
 	sort: function(req, res) {
 		var sortOrder = req.query.link;
 		var i = 0;
 
+		// Need to check to make sure the user is the link owner
+
 		sortOrder.forEach(function(item) {
-			Link.update({ id: parseInt(item), user: req.user.id }, { position: i }, function (err, linkInfo) {	});
+			Linkinfo.update({ link: parseInt(item) }, { position: i }, function (err, info) {	});
 			i++;
 		});
 
+	},
+
+	view: function(req, res) {
+		var title = req.param('title');
+
+		title = title.replace('-', ' ')
+		title = title.replace('+', ' ');
+
+		Linkdata.findOne({title: title}, function(err, link) {
+			if (link)
+				res.send(link.url);
+			else
+				res.send('Not found');
+		});
 	},
 
 	//REMOVE THIS BEFORE PRODUCTION
 
 	destroyAll: function(req, res) {
 		Link.destroy({ id: { '>': 1 }}, function(err, result) {
-			res.send('done');
+			Linkdata.destroy({ id: { '>': 1 }}, function(err, result) {
+				res.send('done');
+			});
 		});
+
 	} 
 }
 

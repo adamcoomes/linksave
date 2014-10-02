@@ -28,5 +28,14 @@ module.exports = {
 			
 			});
   	}
-  }
+  },
+
+	destroyAll: function(req, res) {
+		User.destroy({ id: { '>': 1 }}, function(err, result) {
+			res.send('done');
+		});
+		Passport.destroy({ id: { '>': 1 }}, function(err, result) {
+			res.send('done');
+		});
+	}  
 }

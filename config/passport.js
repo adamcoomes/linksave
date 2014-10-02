@@ -46,9 +46,11 @@ module.exports.passport = {
     strategy: require('passport-facebook').Strategy,
     options: {
       clientID: '303727696477724',
-      clientSecret: '01410363aaeeacdae07332eb47ed029b'
-    }
-  },
+      clientSecret: '01410363aaeeacdae07332eb47ed029b',
+      scope: ['email', 'user_photos'],
+      profileFields: ['id', 'displayName', 'photos', 'emails']      
+    },
+  }
 
   // google: {
   //   name: 'Google',

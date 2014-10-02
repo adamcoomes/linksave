@@ -2,7 +2,12 @@
     <div class="container main-area">
     	<div class="row">
 				<div class="col-md-2">
-					
+					<h2>Tags</h2>
+					<ul id="tags">
+					<% tags.forEach(function(tag) { %>
+						<li><%= tag.name %></li>
+					<% }); %>
+					</ul>
 				</div>
 				<div class="col-md-10">
 					<div class="link-input-area">
@@ -29,19 +34,7 @@
 					<div class="link-area">
 						<ul id="sortable" class="link-list">
 							<% links.forEach(function(link) { %>		
-								<li id="link-<%= link.id %>">						
-									<span class="link-href" style="display: none"><%= link.url %></span>
-									<div class="link-item">
-										<div class="link-top"><img src="<%= link.favicon %>"></div>
-										<div class="link-bg" style="background-image: url('webshots/<%= link.id %>.jpg'); background-size: 165px 124px">
-											<div class="link-overlay">
-												<div class="link-favicon"><img src="<%= link.favicon %>"></div>
-												<h3 class="link-title"><%= link.title %><br /></h3>
-											</div>
-										</div>
-										<div class="link-bottom"><div class="link-views-icon"><span class="glyphicon glyphicon-eye-open"></div><div class="link-views-text"><%= link.views %></div><div class="link-saves"><span class="glyphicon glyphicon-bookmark"></span</div></div>
-									</div>
-								</li>
+								<% include ../../assets/templates/link.ejs %>
 							<% }); %>
 						</ul>
 					</div>

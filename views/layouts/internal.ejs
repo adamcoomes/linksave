@@ -3,65 +3,120 @@
   <meta charset="utf-8">
   <title>Linksave - Save Your Favorite Links and Bookmarks </title>
   <meta name="description" content="Bookmark your favorite links and access them anywhere, anytime">
-  <meta name="viewport" content="width=device-width">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">  
   <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300,600' rel='stylesheet' type='text/css'> 
     <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-      <![endif]-->  
-      <!--STYLES-->
-      <link rel="stylesheet" href="/styles/bootstrap.min.css">
-      <link rel="stylesheet" href="/styles/bootstrap-theme.min.css">
-      <link rel="stylesheet" href="/styles/style.css">
-      <!--STYLES END-->
-    </head>
-    <body>
+    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->  
+    <!--STYLES-->
+    <link rel="stylesheet" href="/styles/bootstrap.min.css">
+    <link rel="stylesheet" href="/styles/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="/styles/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles/style.css">
+    <!--STYLES END-->
+  </head>
+  <body>
+  <div class="alert" role="alert" style="display: none;">
+    <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+    <div id="alert-text"></div>
+  </div>
+  <div class="modal fade" id="link-modal">
+    <div class="modal-dialog">
+      <div class="modal-content" id="link-modal-content">
+
+      </div>
+    </div>
+  </div>
+  <div class="row" id="wrapper">
+    <div id="menu" style="display: none">
+      <div id="menu-area">
+        <h2><i class="fa fa-tags"></i> tags</h2>
+        <div id="tags-area">
+          <% var tag = ''; for (var i=0; i<tags.length; i++) { tag = tags[i]; %>
+            <% include ../../assets/templates/tag.ejs %>
+          <% } %>
+        </div>
+      </div>
+    </div>
+    <div id="menu-trigger">
+      <div><i class="fa fa-chevron-left"></i></div>
+    </div>
+    <div id="body-area">  
       <!-- Static navbar -->
       <div class="navbar navbar-default navbar-static-top" role="navigation">
-        <div class="container">
-          <div class="navbar-header">
-            <a class="navbar-brand" href="#"><img src="images/logo.png" width="150" height="32"></a>
+        <div class="container" id="nav-container">
+          <div class="link-input-area nav-left">
+            <form role="form" id="link-form">
+              <div class="input-group input-group-lg">
+                <span class="input-group-addon"><img id="logo" src="../images/logo.png" width="95" height="20"></span>
+                <input type="text" class="form-control" id="link-input" placeholder="Enter or Copy/Paste a URL">
+                <span class="input-group-btn">
+                  <button id="addButton" data-loading-text="Adding.." type="submit" class="btn btn-custom">Add</button>
+                  <button type="button" class="btn btn-custom dropdown-toggle" data-toggle="dropdown">
+                    <span class="glyphicon glyphicon-tags"></span>
+                  </button>
+                  <ul class="dropdown-menu" id="link-input-tags" role="menu">
+                    <li>
+                      <ul>
+                        <% for (var i=0; i<tags.length; i++) { %>
+                        <li><input type="checkbox" class="select-tags" name="tags" value="<%= tags[i].id %>"> #<%= tags[i].name %></li>
+                        <% } %>
+                      </ul>
+                    </li>
+                    <li class="divider"></li>
+                    <li>
+                      <div class="form-group" id="link-new-tag-div">
+                        <div class="input-group">
+                          <div class="input-group-addon">#</div>
+                          <input class="form-control" type="text" id="link-new-tag" placeholder="new tag">
+                        </div>
+                      </div>
+                    </li>
+                  </ul>
+                </span>
+              </div>
+            </form>
           </div>
-          <div id="logged-in">
+          <div class="nav-right">
             <ul class="nav navbar-nav navbar-right">
-             <li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                 <span id="user-pic"<% if (req.user.photo) { %> style="background-image: url('<%= req.user.photo %>');"<% } %>></span>
                 <span id="user-name"><% if (req.user.first_name) { if (req.user.last_name) { %><%= req.user.first_name %> <%= req.user.last_name %><% } else { %><%= req.user.first_name %><% } } else { %><%= req.user.email %><% } %></span>
                 <span class="caret"></span></a>
                 <ul class="dropdown-menu" role="menu">
-                <li><a href="/logout" id="user-logout">Logout</a></li>
+                  <li><a href="/logout" id="user-logout">Logout</a></li>
                 </ul>
               </li>
             </ul>
-          </div>	  
-        </div>        
+          </div>
+        </div> 
       </div><!--/.nav-collapse -->
-    </div>
-
-    <%- body %>
-
-    <!--TEMPLATES-->
-    <script type="text/javascript" src="/jst.js"></script>
-    <!--TEMPLATES END-->
-
-    <div class="footer">
-      <div class="container">
-        <p class="text-muted">&copy; 1999-2014 Linksave.net</p>
+      <%- body %>
+      <div class="footer">
+        <div class="container">
+          <p class="text-muted">&copy; 1999-2014 Linksave.net</p>
+        </div>
       </div>
+      <!--TEMPLATES-->
+      <script type="text/javascript" src="/jst.js"></script>
+      <!--TEMPLATES END-->
     </div>
-
-
+  </div>
     <!--SCRIPTS-->
     <script src="/js/dependencies/sails.io.js"></script>
     <script src="/js/dependencies/jquery1.11.js"></script>
+    <script src="/js/dependencies/jquery-ui.min.js"></script>
     <script src="/js/dependencies/bootstrap.min.js"></script>
     <script src="/js/dependencies/ejs_0.9_alpha_1.js"></script>
-    <script src="/js/dependencies/jquery-ui.min.js"></script>
+    <script src="/js/dependencies/jquery.jpanelmenu.min.js"></script>
+    <script src="/js/dependencies/jquery.masonry.js"></script>
     <script src="/js/dependencies/jquery.zoom.min.js"></script>
     <script src="/js/dependencies/underscore.js"></script>
     <script src="/js/home.js"></script>
     <script src="/js/main.js"></script>
     <!--SCRIPTS END-->
+
   </body>
-  </html>
+</html>

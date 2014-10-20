@@ -1,0 +1,22 @@
+          <form role="form" id="tag-edit-form">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+              <h4 class="modal-title">Edit Link</h4>
+            </div>
+            <div class="modal-body" id="link-modal-body">
+              <div class="form-group">
+                <span style="display: none" id="edit-tag-id"><%= tag.id %></span>
+                <label for="edit-tag-div">Tag Name</label>
+                <div class="form-group" id="edit-tag-div">
+                <div class="input-group">
+                  <div class="input-group-addon">#</div>
+                  <input class="form-control" type="text" id="edit-tag-name" value="<%= tag.name %>">
+                </div>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+              <input type="submit" id="link-edit-submit" class="btn btn-primary" value="Save changes">
+            </div>
+          </form>  

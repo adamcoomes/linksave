@@ -8,6 +8,7 @@
 var webpageinfo = require("webpage-info");
 var webshot = require('webshot');
 var fs = require('fs');
+var urltitle = require('url-title');
 
 module.exports = {
 	
@@ -16,58 +17,102 @@ module.exports = {
 		var link = new Object();
 		var data = new Object();
 		var url = req.query.url;
+		var tags = req.query.tags;
 		link.user = req.user;
+
+		console.log(tags);
 
 		var lastChar = url.length - 1;
 		if(url.lastIndexOf('/') === lastChar)
     	url = url.substring(0, lastChar);		
 
-		data.url = url;
+		function saveLink(link) {
+			var save = _.clone(link);
 
-    function addLink(link, info) {
-    	link.title = info.title;
-    	link.info = info;
-
-
-			Link.create(link, function (err, newlink) {				
+			Link.create(link, function (err, newlink) {
 				if (err)
-					res.send(err);
+					console.log(err);
 				else {
-					newlink.info = info;
-					newlink.info.id = link.info;
-  				res.send(newlink);
+					save.id = newlink.id;
+					res.send(save);
 				}
 			});
+		};
 
+    function addLink(info) {
+    	link.info = info;
+			link.tags = [];
+    	link.title = info.title;			
+			link.slug = link.title.replace(/\s+/g, '-').toLowerCase();
+			link.views = 0;
+			link.saves = 0;			
+
+			if(tags) {
+				var tagcount = 0;
+				tags.forEach(function(tag) {
+					Tag.findOne(tag).exec(function (err, foundTag) {
+						if (foundTag) 
+							link.tags.push(foundTag);
+						else
+							link.tags.push({id: foundTag.id, name: foundTag.name});
+
+						tagcount++;
+
+						if (tagcount === tags.length) {
+							saveLink(link);
+						}
+
+					});
+				});
+			} else {
+				saveLink(link);
+			}
     };
 
 		Linkdata.findOne({url: url}).exec(function(err, foundData) {
 			if (foundData) {
-				addLink(link, foundData);
+				addLink(foundData);
 			}
 			else {
+				data.url = url;
 				webpageinfo.parse(url, function(webdata) {
-					if (webdata.error) {
-						data.title = url;
-						data.favicon = '';
-					} else {
-						data.title = webdata.title;
-						data.favicon = webdata.favicon;
-					}
+					data.favicon = webdata.favicon;
 
-					Linkdata.create(data);
-					addLink(link, data);
-				
-				}, 3000);
+					if (webdata.title === url)
+						data.title = urltitle(url);
+					else
+						data.title = webdata.title;
+
+					Linkdata.create(data).exec(function(err, result) {
+						addLink(result);
+					});
+				}, 2000);
 			}
 		});
-			
-			// Link.find({ where: { user: req.user.id }, sort: 'position ASC' }, function(err, eachlink) {
-			// 	for (var i=0; i<eachlink.length; i++) {
-			// 		Link.update({ id: eachlink[i] }, { position: (i+1) });
-			// 	}
-			// });
+	},
 
+	edit: function(req, res) {
+		var link = new Object();
+		var id = req.body.id;
+		var title = req.body.title;
+		var tags = req.body.tags;
+		var user = req.user;
+
+		console.log(user);
+
+		Link.update({user: user.id, id: id}, {title: title, tags: tags}, function (err, info) {
+
+			if (err) {
+				res.send(err);
+				console.log(err);	
+			}
+			else {
+				Link.findOne(id).populate('tags').exec(function(err, link) {
+					res.send(link);
+				});
+			}
+		
+		});
 	},
 
 	webshot: function(req, res) {
@@ -85,13 +130,13 @@ module.exports = {
   		if (exists)
     		res.send(shotFile);
     	else {
-				webshot(url, shotPath, {windowSize: {width: 640, height: 480}, shotSize: {width: 640, height: 480}}, function(err) {
+				webshot(url, shotPath, {windowSize: {width: 640, height: 480}, shotSize: {width: 640, height: 480}, defaultWhiteBackground: true}, function(err) {
 					setTimeout(function(){ 
 			  		if (err)
 							res.send('error');
 						else
 			  			res.send(shotFile);
-					}, 2000);
+					}, 3000);
 				});
     	}
 		});		
@@ -122,6 +167,16 @@ module.exports = {
 			else
 				res.send('Not found');
 		});
+	},
+
+	remove: function(req, res) {
+		var id = req.body.id;
+		var user = req.user;		
+
+		Link.destroy({user: user.id, id: id}, function (err, link) {
+			if (!err)
+				res.send(link[0]);
+		});		
 	},
 
 	//REMOVE THIS BEFORE PRODUCTION

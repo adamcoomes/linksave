@@ -1,13 +1,33 @@
-								<li id="link-<%= link.id %>">
-									<span class="link-info" style="display: none"><%= link.info.id %></span>										
-									<span class="link-href" style="display: none"><%= link.info.url %></span>
-									<div class="link-item">
-										<div class="link-bg" style="background-image: url('webshots/<% if (typeof defaultImage !== 'undefined') { %>default.jpg<% } else { %><%= link.info.id %>.jpg<% } %>'); background-size: 165px 124px">
-											<div class="link-overlay">
-												<div class="link-favicon"><img src="<%= link.info.favicon %>"></div>
-												<h3 class="link-title"><%= link.title %><br /></h3>
+								<div class="link-item" id="link-<%= link.id %>">
+									<div class="link-inner">
+										<span class="link-info" style="display: none"><%= link.info.id %></span>										
+										<span class="link-href" style="display: none"><%= link.info.url %></span>
+										<div class="link-webshot"><img width="200" height="150" src="webshots/<% if (typeof defaultImage !== 'undefined') { %>default.jpg<% } else { %><%= link.info.id %>.jpg<% } %>"></div>
+										<div class="link-details">
+											<a href="<%= link.info.url %>" title="<%= link.info.url %>" target="_new">
+												<div class="link-section link-url"><img src="<%= link.info.favicon %>"><p><%= link.info.url %></p></div>
+												<div class="link-section link-title"><%= link.title %></div>
+												<div class="link-section link-tags">
+												<% if (link.tags) { %>
+												<% for (var i=0; i<link.tags.length; i++) { %>
+        									<a class="tag-filter tag-link" href="#"><span class="tag-filter-id" style="display: none"><%= link.tags[i].id %></span>#<span class="tag-filter-name"><%= link.tags[i].name %></span>&nbsp;</a>
+								        <% } } %>
+												</div>
+											</a>
+											<div class="link-section link-share" id="link-share-<%= link.id %>">
+												<div class="link-share-icons">
+													<a href="https://twitter.com/intent/tweet?url=<%= encodeURIComponent(link.info.url) %>&text=<%= encodeURIComponent(link.title) %>&via=linksave"><i class="fa fa-twitter-square"></i></a>
+													<a href="https://facebook.com/sharer.php?u=<%= encodeURIComponent(link.info.url) %>"><i class="fa fa-facebook-square"></i></a>
+													<a href="https://pinterest.com/pin/create/button?url=<%= encodeURIComponent(link.info.url) %>"><i class="fa fa-pinterest-square"></i></a>
+												</div>
+											</div>
+											<div class="link-bottom">
+												<div class="link-views-icon"><span class="glyphicon glyphicon-eye-open"></div>
+												<div class="link-views-text"><%= link.views %></div>
+												<div class="link-saves-icon"><span class="glyphicon glyphicon-bookmark"></span></div>
+												<div class="link-saves-text"><%= link.views %></div>
+												<div class="link-settings"><a href="#" class="link-edit-click" id="link-edit-<%= link.id %>" data-toggle="modal" data-target="#link-modal"><span class="glyphicon glyphicon-cog"></span><a href="#" class="link-remove-click" id="link-remove-<%= link.id %>"><span class="glyphicon glyphicon-trash"></span></a></div>
 											</div>
 										</div>
-										<div class="link-bottom"><div class="link-views-icon"><span class="glyphicon glyphicon-eye-open"></div><div class="link-views-text"><%= link.views %></div><div class="link-saves"><span class="glyphicon glyphicon-bookmark"></span</div></div>
 									</div>
-								</li>
+								</div>

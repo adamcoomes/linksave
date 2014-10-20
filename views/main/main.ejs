@@ -1,43 +1,9 @@
     <!-- Begin page content -->
-    <div class="container main-area">
-    	<div class="row">
-				<div class="col-md-2">
-					<h2>Tags</h2>
-					<ul id="tags">
-					<% tags.forEach(function(tag) { %>
-						<li><%= tag.name %></li>
-					<% }); %>
-					</ul>
-				</div>
-				<div class="col-md-10">
-					<div class="link-input-area">
-						<form role="form" id="link-form"> 
-							<div class="input-group input-group-lg">
-								<input type="text" class="form-control" id="link-input" placeholder="Enter or Copy/Paste a URL">
-								<span class="input-group-btn">
-									<button class="btn btn-primary" type="submit">Add</button>
-								</span>
-							</div>
-						</form>
+    <div class="main-area">
+    			<div id="filter-area" style="display: none"><div id="filter-text">Filtered by</div></div>
+					<div id="link-area">
+						<% links.forEach(function(link) { %>		
+							<% include ../../assets/templates/link.ejs %>
+						<% }); %>
 					</div>
-					<div class="row main-nav">
-						<div class="main-nav-left col-md-6">
-							<a href="#" id="icon-reorder"><span class="glyphicon glyphicon-th"></span>&nbsp;Reorder Links <b>[<span id="icon-reorder-onoff">Off</span>]</b></a>
-						</div>
-						<div class="main-nav-right col-md-6">
-							<span class="glyphicon glyphicon-sort-by-attributes"></span>&nbsp;&nbsp;&nbsp;<span class="glyphicon glyphicon-sort-by-attributes-alt"></span>&nbsp;&nbsp;&nbsp;Title							
-						</div>
-					</div>
-					<div class="navigation">
-						<a href="#"></a>
-					</div>					
-					<div class="link-area">
-						<ul id="sortable" class="link-list">
-							<% links.forEach(function(link) { %>		
-								<% include ../../assets/templates/link.ejs %>
-							<% }); %>
-						</ul>
-					</div>
-				</div>
-			</div>	
     </div>

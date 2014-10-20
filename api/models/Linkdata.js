@@ -13,15 +13,6 @@ module.exports = {
   	slug: { type: 'string' },
   	favicon: { type: 'string' },
   	links: { collection: 'link', via: 'info' }
-  },
-
-  beforeCreate: function (values, next) {
-  	if (!values.name)
-  		next();
-
-  	values.slug = values.title.replace(/\s+/g, '-').toLowerCase();
-
   }
-
 };
 

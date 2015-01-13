@@ -13,17 +13,23 @@
     <link rel="stylesheet" href="/styles/bootstrap.min.css">
     <link rel="stylesheet" href="/styles/bootstrap-theme.min.css">
     <link rel="stylesheet" href="/styles/font-awesome.min.css">
+    <link rel="stylesheet" href="/styles/sweet-alert.css">
     <link rel="stylesheet" href="/styles/style.css">
+    <link rel="stylesheet" href="/styles/bootstrap-social.css">
     <!--STYLES END-->
   </head>
   <body>
-  <div class="alert" role="alert" style="display: none;">
-    <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-    <div id="alert-text"></div>
-  </div>
-  <div class="modal fade" id="link-modal">
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&appId=303727696477724&version=v2.0";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+  <div class="modal fade" id="main-modal">
     <div class="modal-dialog">
-      <div class="modal-content" id="link-modal-content">
+      <div class="modal-content" id="main-modal-content">
 
       </div>
     </div>
@@ -60,7 +66,7 @@
                     <li>
                       <ul>
                         <% for (var i=0; i<tags.length; i++) { %>
-                        <li><input type="checkbox" class="select-tags" name="tags" value="<%= tags[i].id %>"> #<%= tags[i].name %></li>
+                        <li><input type="checkbox" class="select-tags" name="tags" value="<%= tags[i].id %>"> #<span id="link-input-tag-<%= tags[i].id %>"><%= tags[i].name %></span></li>
                         <% } %>
                       </ul>
                     </li>
@@ -83,9 +89,11 @@
               <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                 <span id="user-pic"<% if (req.user.photo) { %> style="background-image: url('<%= req.user.photo %>');"<% } %>></span>
-                <span id="user-name"><% if (req.user.first_name) { if (req.user.last_name) { %><%= req.user.first_name %> <%= req.user.last_name %><% } else { %><%= req.user.first_name %><% } } else { %><%= req.user.email %><% } %></span>
+                <span id="user-name"><% if (req.user.name) { %><%= req.user.name %><% } else { %><%= req.user.email %><% } %></span>
                 <span class="caret"></span></a>
                 <ul class="dropdown-menu" role="menu">
+                  <li><a href="#" id="user-profile" data-toggle="modal" data-target="#main-modal">Profile</a></li>
+                  <li><a href="#" id="user-photo" data-toggle="modal" data-target="#main-modal">Photo</a></li>
                   <li><a href="/logout" id="user-logout">Logout</a></li>
                 </ul>
               </li>
@@ -93,12 +101,26 @@
           </div>
         </div> 
       </div><!--/.nav-collapse -->
+      <div id="alert-area">
+      <% if (!req.user.verified) { %><% include ../../assets/templates/alert.ejs %><% } %>
+      <% if (showVerify) { %><span id="showVerify" style="display: none">1</span><% } %>
+      </div>
       <%- body %>
       <div class="footer">
         <div class="container">
-          <p class="text-muted">&copy; 1999-2014 Linksave.net</p>
+          <p>&copy; 2014 Keymash, LLC</p>
+          <div class="footer-links">
+            <a href="/terms">Terms of Service</a>
+            <a href="/privacy">Privacy Policy</a>
+          </div>
+          <div class="footer-fb">
+            <div class="fb-like" data-href="https://www.facebook.com/pages/Linksave/361152764065713?ref=bookmarks" data-layout="button_count" data-action="like" data-show-faces="false" data-share="false"></div>
+          </div>
+          <div class="footer-twitter">
+            <a href="https://twitter.com/share" class="twitter-share-button" data-url="http://linksave.com" data-text="Save links and access them anywhere, anytime with Linksave!" data-via="linksaveapp" data-related="linksaveapp">Tweet</a> <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+          </div>      
         </div>
-      </div>
+      </div>    
       <!--TEMPLATES-->
       <script type="text/javascript" src="/jst.js"></script>
       <!--TEMPLATES END-->
@@ -110,13 +132,17 @@
     <script src="/js/dependencies/jquery-ui.min.js"></script>
     <script src="/js/dependencies/bootstrap.min.js"></script>
     <script src="/js/dependencies/ejs_0.9_alpha_1.js"></script>
+    <script src="/js/dependencies/jquery.cropit.min.js"></script>
+    <script src="/js/dependencies/jquery.endless-scroll.js"></script>
+    <script src="/js/dependencies/jquery.infinitescroll.min.js"></script>
     <script src="/js/dependencies/jquery.jpanelmenu.min.js"></script>
+    <script src="/js/dependencies/jquery.jscroll.min.js"></script>
     <script src="/js/dependencies/jquery.masonry.js"></script>
     <script src="/js/dependencies/jquery.zoom.min.js"></script>
+    <script src="/js/dependencies/sweet-alert.min.js"></script>
     <script src="/js/dependencies/underscore.js"></script>
-    <script src="/js/home.js"></script>
-    <script src="/js/main.js"></script>
     <!--SCRIPTS END-->
-
+    <script src="/js/header.js"></script>
+    <script src="/js/main.js"></script>
   </body>
 </html>

@@ -1,0 +1,68 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Linksave - Save Your Favorite Links and Bookmarks </title>
+  <meta name="description" content="Bookmark, save and share your favorite links online.">
+  <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,300,600' rel='stylesheet' type='text/css'> 
+    <!--[if lt IE 9]>
+  <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+  <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+  <![endif]-->  
+  <!--STYLES-->
+  <link rel="stylesheet" href="/styles/bootstrap.min.css">
+  <link rel="stylesheet" href="/styles/bootstrap-theme.min.css">
+  <link rel="stylesheet" href="/styles/font-awesome.min.css">
+  <link rel="stylesheet" href="/styles/sweet-alert.css">
+  <link rel="stylesheet" href="/styles/style.css">
+  <link rel="stylesheet" href="/styles/bootstrap-social.css">
+  <!--STYLES END-->
+</head>
+<body>
+  <!-- Static navbar -->
+  <div class="navbar navbar-default navbar-static-top" role="navigation">
+    <div class="container">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="/"><img src="images/about_logo.png" style="margin-top: -5px" width="200" height="24"></a>
+      </div>
+      <div class="navbar-collapse collapse">
+        <div id="not-logged-in">
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="/terms">Terms of Service</a></li>
+            <li><a href="/privacy">Privacy Policy</a></li>
+          </ul>
+        </div> 
+      </div>        
+    </div><!--/.nav-collapse -->
+  </div>
+
+  <%- body %>
+
+  <!--TEMPLATES-->
+  <script type="text/javascript" src="/jst.js"></script>
+  <!--TEMPLATES END-->
+
+  <div class="footer">
+    <div class="container">
+      <p class="text-muted">&copy; 1999-2014 Linksave.net</p>
+    </div>
+  </div>
+
+
+  <!--SCRIPTS-->
+  <script src="/js/dependencies/sails.io.js"></script>
+  <script src="/js/dependencies/jquery1.11.js"></script>
+  <script src="/js/dependencies/jquery-ui.min.js"></script>
+  <script src="/js/dependencies/bootstrap.min.js"></script>
+  <script src="/js/dependencies/ejs_0.9_alpha_1.js"></script>
+  <script src="/js/dependencies/jquery.cropit.min.js"></script>
+  <script src="/js/dependencies/jquery.endless-scroll.js"></script>
+  <script src="/js/dependencies/jquery.infinitescroll.min.js"></script>
+  <script src="/js/dependencies/jquery.jpanelmenu.min.js"></script>
+  <script src="/js/dependencies/jquery.jscroll.min.js"></script>
+  <script src="/js/dependencies/jquery.masonry.js"></script>
+  <script src="/js/dependencies/jquery.zoom.min.js"></script>
+  <script src="/js/dependencies/sweet-alert.min.js"></script>
+  <script src="/js/dependencies/underscore.js"></script>
+  <!--SCRIPTS END-->
+</body>
+</html>

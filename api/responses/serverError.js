@@ -12,6 +12,8 @@
  * automatically.
  */
 
+var errors = require('custom/errors');
+
 module.exports = function serverError (data, options) {
 
   // Get access to `req`, `res`, & `sails`
@@ -57,6 +59,14 @@ module.exports = function serverError (data, options) {
 
     // If a view error occured, fall back to JSON(P).
     if (err) {
+
+      var userid = 0;
+
+      if (req.hasOwnProperty('user'))
+        userid = req.user.id;
+      
+      errors.log(err, 'Server Error', userid);
+
       //
       // Additionally:
       // • If the view was missing, ignore the error but provide a verbose log.

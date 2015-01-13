@@ -1,4 +1,6 @@
 var validator = require('validator');
+var sendEmail = require('custom/send-email');
+var utils = require('custom/utils');
 
 /**
  * Local Authentication Protocol
@@ -25,7 +27,8 @@ var validator = require('validator');
 exports.register = function (req, res, next) {
   var email    = req.param('email')
     , username = req.param('username')
-    , password = req.param('password');
+    , password = req.param('password')
+    , verifyToken = '';
 
   if (!email) {
     req.flash('error', 'Error.Passport.Email.Missing');
@@ -42,9 +45,12 @@ exports.register = function (req, res, next) {
     return next(new Error('No password was entered.'));
   }
 
+  verifyToken = utils.randomString(32);
+
   User.create({
     username : username
   , email    : email
+  , verifyToken : verifyToken
   }, function (err, user) {
     if (err) {
       if (err.code === 'E_VALIDATION') {
@@ -58,6 +64,14 @@ exports.register = function (req, res, next) {
       return next(err);
     }
 
+    var locals = {
+      email: user.email,
+      id: user.id,
+      token: user.verifyToken
+    };
+
+    sendEmail.send(locals, 'email-confirm', 'Confirm your Linksave account')
+ 
     Passport.create({
       protocol : 'local'
     , password : password

@@ -1,10 +1,12 @@
 								<div class="link-item" id="link-<%= link.id %>">
 									<div class="link-inner">
 										<span class="link-info" style="display: none"><%= link.info.id %></span>										
+										<span class="link-id" style="display: none"><%= link.id %></span>		
 										<span class="link-href" style="display: none"><%= link.info.url %></span>
-										<div class="link-webshot"><img width="200" height="150" src="webshots/<% if (typeof defaultImage !== 'undefined') { %>default.jpg<% } else { %><%= link.info.id %>.jpg<% } %>"></div>
+										<span class="link-webshot-updated" style="display: none"><%= link.info.updatedAt %></span>
+										<div class="link-webshot"><% if (link.embed) { %> <%- link.embed %> <% } else { %><img width="240" height="180" src="webshots/<% if (typeof defaultImage !== 'undefined') { %>default.jpg<% } else { %><%= link.info.id %>.jpg<% } %>"><% } %></div>
 										<div class="link-details">
-											<a href="<%= link.info.url %>" title="<%= link.info.url %>" target="_new">
+											<a class="link-visit link-visit-<%= link.id %>" href="<%= link.info.url %>" title="<%= link.info.url %>" target="_new">
 												<div class="link-section link-url"><img src="<%= link.info.favicon %>"><p><%= link.info.url %></p></div>
 												<div class="link-section link-title"><%= link.title %></div>
 												<div class="link-section link-tags">
@@ -18,15 +20,17 @@
 												<div class="link-share-icons">
 													<a href="https://twitter.com/intent/tweet?url=<%= encodeURIComponent(link.info.url) %>&text=<%= encodeURIComponent(link.title) %>&via=linksave"><i class="fa fa-twitter-square"></i></a>
 													<a href="https://facebook.com/sharer.php?u=<%= encodeURIComponent(link.info.url) %>"><i class="fa fa-facebook-square"></i></a>
-													<a href="https://pinterest.com/pin/create/button?url=<%= encodeURIComponent(link.info.url) %>"><i class="fa fa-pinterest-square"></i></a>
+													<a href="https://pinterest.com/pin/create/button?url=<%= encodeURIComponent(link.info.url) %>&media=http://linksave.com/webshots/<%= link.info.id %>.jpg&description=<%= encodeURIComponent(link.title) %>"><i class="fa fa-pinterest-square"></i></a>
 												</div>
 											</div>
 											<div class="link-bottom">
-												<div class="link-views-icon"><span class="glyphicon glyphicon-eye-open"></div>
-												<div class="link-views-text"><%= link.views %></div>
+												<div class="link-visits-icon"><span class="glyphicon glyphicon-eye-open"></div>
+												<div class="link-visits-text"><%= link.visits %></div>
+												<!--
 												<div class="link-saves-icon"><span class="glyphicon glyphicon-bookmark"></span></div>
-												<div class="link-saves-text"><%= link.views %></div>
-												<div class="link-settings"><a href="#" class="link-edit-click" id="link-edit-<%= link.id %>" data-toggle="modal" data-target="#link-modal"><span class="glyphicon glyphicon-cog"></span><a href="#" class="link-remove-click" id="link-remove-<%= link.id %>"><span class="glyphicon glyphicon-trash"></span></a></div>
+												<div class="link-saves-text"><%= link.visits %></div>
+												-->
+												<div class="link-settings"><a href="#" class="link-edit-click" id="link-edit-<%= link.id %>" data-toggle="modal" data-target="#main-modal"><span class="glyphicon glyphicon-cog"></span><a href="#" class="link-remove-click" id="link-remove-<%= link.id %>"><span class="glyphicon glyphicon-trash"></span></a></div>
 											</div>
 										</div>
 									</div>

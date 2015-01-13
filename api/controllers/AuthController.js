@@ -32,7 +32,8 @@ var AuthController = {
    */
   login: function (req, res) {
     var strategies = sails.config.passport
-      , providers  = {};
+      , providers  = {}
+      , reset = req.query.r;
 
     // Get a list of available providers for use in your templates.
     Object.keys(strategies).forEach(function (key) {
@@ -45,9 +46,12 @@ var AuthController = {
     });
 
     // Render the `auth/login.ext` view
-    res.view({
+    res.view('home', {
       providers : providers
     , errors    : req.flash('error')
+    , showLogin : true
+    , reset : reset
+    , layout : 'layouts/public'
     });
   },
 
@@ -67,7 +71,7 @@ var AuthController = {
    */
   logout: function (req, res) {
     req.logout();
-    res.redirect('/');
+    res.redirect('/login');
   },
 
   /**
@@ -86,8 +90,9 @@ var AuthController = {
    * @param {Object} res
    */
   register: function (req, res) {
-    res.view({
+    res.view('home', {
       errors: req.flash('error')
+    , layout : 'layouts/public'      
     });
   },
 
@@ -129,9 +134,18 @@ var AuthController = {
       if (err) return tryAgain();
 
       req.login(user, function (loginErr) {
-        console.log(loginErr);
 
         if (loginErr) return tryAgain();
+
+        if (req.body) {
+          if (req.body.hasOwnProperty('remember')) {
+            var oneWeek = 1000 * 60 * 60 * 24 * 7;
+            req.session.cookie._expires = new Date(Date.now() + oneWeek);
+            req.session.cookie.originalMaxAge = oneWeek;
+          }
+        }
+        
+        // user logged in message
 
         // Upon successful login, send the user to the homepage were req.user
         // will available.

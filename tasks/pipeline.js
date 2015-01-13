@@ -19,7 +19,9 @@ var cssFilesToInject = [
   'styles/bootstrap-theme.min.css',
   'styles/font-awesome.min.css',
   'styles/slidebars.min.css',
-  'styles/style.css'
+  'styles/sweet-alert.css',  
+  'styles/style.css',
+  'styles/bootstrap-social.css'  
 ];
 
 
@@ -38,7 +40,6 @@ var jsFilesToInject = [
 
   // All of the rest of your client-side js files
   // will be injected here in no particular order.
-  'js/**/*.js'
 ];
 
 

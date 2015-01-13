@@ -1,45 +1,73 @@
 $(document).ready(function () {
 	$('#signupBtn').click(function () {
 		$("#signup-text-inner").hide();
-		$(".signup-wrapper").fadeIn(500);
+		$(".signin-wrapper").fadeIn(500);
 	});
-	
+
+	var csrf = '';
+
+	$.ajax({
+		type: 'GET',
+		url: '/csrfToken',
+		async: false
+	}).done(function(data) {
+		csrf = data._csrf;
+	});	
+
 	var error = false;
 	
-	function validateForm(check) {
+	function validateForm(email, password, verifyPassword) {
 		error = false;
-		var data = { email: $("#signupEmail").val() }
-		if (check === 'email' || check === 'all') {
-			$.post("/user/validate", data).done(function(result) {
-				if (result.email.length)
-					$("#signupEmailDiv").removeClass('has-error').addClass('has-success');
-				else {	
-					$("#signupEmailDiv").removeClass('has-success').addClass('has-error');
-					$("#signupError").text("That email address is in use.").css("visibility", "visible");
+		if (email) {
+			var data = { email: email, _csrf: csrf };
+			$.post("/api/user/validate", data).done(function(result) {
+				if (!result.email.length) {
+					$(".formError").text("That email address is in use.").fadeIn(200);
 					error = true;
 				}
 			});
 		}
-		else if (check === 'password' || check === 'all') {
-			var password = $("#signupPassword").val();
+		
+		if (password) {
 			if (password.length && password.length < 8) {
-				$("#signupError").text("Your password must be at least 8 characters.").css("visibility", "visible");			
-				$("#signupPasswordDiv").removeClass('has-success').addClass('has-error');
+				$(".formError").text("Your password must be at least 8 characters.").fadeIn(200);			
 				error = true;
-			} else
-				$("#signupPasswordDiv").removeClass('has-error').addClass('has-success');
+			}
+		}
+
+		if (verifyPassword) {
+			if (password != verifyPassword) {
+				$(".formError").text("Passwords do not match. Try again.").fadeIn(200);
+				error = true;
+			}
 		}
 
 		if (error)
 			return false;
 		
-		$("#signupError").css("visibility", "hidden");
+		$(".formError").fadeOut(200);
 		return true;
 	}
 
-	$('#signupEmail').focusout(function() { validateForm('email'); });
+	$("#resetForm").submit(function() {
+		if (error)
+			return false;
 
-	$('#signupPassword').focusout(function() { validateForm('password');	});
+		if ($("#resetEmail")) {
+			if (($("#resetEmail").val().length < 4) || ($("#resetEmail").val().indexOf('@') === '-1'))
+				return false;
+		}
+	});	
+
+	$('#signupEmail').focusout(function() { validateForm($('#signupEmail').val()); });
+
+	$('.userPassword').focusout(function() { 
+		var verifyPassword = '';
+		if ($('#verifyPassword').length)
+			verifyPassword = $('#verifyPassword').val();
+
+		validateForm(null, $(this).val(), verifyPassword);
+	});
 
 	$('#signupForm').submit(function() {
 		var form = this;
@@ -57,16 +85,16 @@ $(document).ready(function () {
 			users += emailSplit[0] + userExt + ',';
 		}
 
-		var data = { username: users };
+		var data = { username: users, _csrf: csrf };
 		var shouldSubmit = false;
 
-		$.ajax({ type: 'POST', url: "/user/validate", data: data, async: false }).done(function(result) {
+		$.ajax({ type: 'POST', url: "/api/user/validate", data: data, async: false }).done(function(result) {
 			if (result.username.length) {
 				$("#signupUsername").val(result.username[0]);	
 				shouldSubmit = true;
 			}
 			else
-				$("#signupError").text("Unknown error. Please try again.").css("visibility", "visible");			
+				$(".formError").text("Unknown error. Please try again.").fadeIn(200);			
 
 		});
 

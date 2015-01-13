@@ -7,16 +7,60 @@ body {
   margin: 0;
   width: 100%;
 }
-body, input, a, h1, h2, h3, p {
+body, input, a, h1, h2, h3, p, strong {
  font-family: 'Open Sans', sans-serif;	
 }
 
-a, a:visited, a:active {
+a {
   color: #2868de;
 }
 
 a:hover {
   color: #2357b8;
+}
+
+.alert-link, .alert-link:visited, .alert-link:hover {
+  color: #8a6d3b;
+  font-weight: bold;
+}
+
+.alert-link:hover {
+  text-decoration: underline;
+}
+
+#signup-text-inner {
+  width: 300px;
+}
+
+.social-connect {
+  color: #3b5998;
+  font-size: 22px;
+  float: left;
+}
+
+.social-link {
+  float: left;
+  color: #3b5998;
+  margin-left: 5px;
+  font-size: 20px;
+}
+
+.social-link-p {
+  float: left;
+  margin-left: 10px;
+}
+
+.password-left {
+  text-align: right;
+  width: 180px;
+}
+
+#change-password div {
+  margin-bottom: 5px;
+}
+
+.photo-text {
+  font-size: 12px;
 }
 
 .btn-custom {
@@ -37,10 +81,9 @@ a:hover {
 }
 
 .footer {
-  display: none;
   position: fixed;
   bottom: 0;
-  height: 60px;
+  height: 40px;
   min-width: 100%;
   padding: 0;
   margin: 0;
@@ -58,15 +101,16 @@ a:hover {
 }
 
 .alert {
-  margin: auto;
+  width: 90%;
+  margin: -24px auto 15px auto;
 }
 
 .navbar {
   padding-top: 10px;
 }
 
-.text-muted {
-  margin: 20px 0;
+.footer p {
+  margin: 10px 0;
 }
 
 .nav-left {
@@ -208,8 +252,8 @@ a:hover {
   vertical-align: top;
 }
 
-#main-area {
-  width: 100%;
+.main-area {
+  visibility: hidden;
 }
 
 #link-area {
@@ -287,14 +331,15 @@ a:hover {
 .link-item {
   background: #fefefe;
   box-shadow: 0 1px 3px rgba(34, 25, 25, 0.4);
-  width:  200px;
+  width:  240px;
   margin-bottom: 20px;  
 }
 
 .link-webshot {
   padding: 0px;
   margin: 0px;
-  width: 200px;
+  width: 240px;
+  height: 180px;
   height: auto;
   border-bottom: 1px solid #F0F0F0;
 /*  -webkit-border-radius: 4px 4px 0 0;
@@ -312,11 +357,11 @@ a:hover {
 }
 
 .link-title {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
   margin: 0px 0px 0px 0px;
   padding: 0px 5px 8px 10px;
-  max-width: 190px;
+  max-width: 230px;
 }
 
 .link-info {
@@ -352,7 +397,7 @@ a:hover {
   padding: 5px 10px;
 }
 
-.link-views, .link-views-text, .link-views-icon, .link-saves-icon, .link-saves-text {
+.link-visits, .link-visits-text, .link-visits-icon, .link-saves-icon, .link-saves-text {
   float: left;
 }
 
@@ -360,11 +405,11 @@ a:hover {
   padding-left: 20px;
 }
 
-.link-views-icon, .link-saves-icon {
+.link-visits-icon, .link-saves-icon {
   padding-top: 2px;
 }
 
-.link-views-text, .link-saves-text {
+.link-visits-text, .link-saves-text {
   padding-left: 5px;
 }
 
@@ -403,6 +448,47 @@ a:hover {
 
 .link-remove-click {
   font-size: 12px;
+}
+
+.fb-like{
+  height: 20px;
+  overflow: hidden;
+}
+
+
+.footer p, .footer-links a {
+  color: #999;
+  font-size: 12px;
+}
+
+.footer-links a{
+  margin-left: 10px;
+}
+
+.footer-links {
+  position: relative;
+  bottom: 29;
+  left: 160;
+  float: left;
+}
+
+.footer-fb {
+  position: relative;
+  bottom: 27;
+  left: 220;
+  float: left;
+}
+
+.footer-twitter {
+  position: relative;
+  bottom: 27;
+  left: 240;
+  float: left;
+}
+
+iframe {
+  width: 240px;
+  height: 180px;
 }
 /*.highlight {
   -webkit-border-radius: 10px;

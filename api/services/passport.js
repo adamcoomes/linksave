@@ -2,6 +2,7 @@ var path     = require('path')
   , url      = require('url')
   , passport = require('passport');
 
+
 /**
  * Passport Service
  *
@@ -100,10 +101,10 @@ passport.connect = function (req, query, profile, next) {
       user.photo = profileJSON.picture.data.url
 
     if (profileJSON.name) {
-      var fullname = profileJSON.name.split(' ');
-      user.first_name = fullname[0];
-      user.last_name = fullname[1];
-      user.username = fullname[0].toLowerCase() + profileJSON.id;
+      var fullname = profileJSON.name;
+      var fullnameSplit = fullname.split(' ');
+      user.name = fullname;
+      user.username = fullnameSplit[0].toLowerCase() + profileJSON.id;
     }
 
     if (!req.user) {
@@ -111,15 +112,20 @@ passport.connect = function (req, query, profile, next) {
       //           authentication provider.
       // Action:   Create a new user and assign them a passport.
       if (!passport) {
+
+        user.verifyToken = '';
+        user.verified = true;
+
         User.create(user, function (err, user) {
           if (err) {
             if(err.code === "E_VALIDATION"){
               req.flash('error', err.invalidAttributes.email ? 
                 'Error.Passport.Email.Exists' : 'Error.Passport.User.Exists');
             }
+
             return next(err);
           }
-          
+
           query.user = user.id;
 
           Passport.create(query, function (err, passport) {

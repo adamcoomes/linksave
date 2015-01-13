@@ -1,43 +1,55 @@
-    <div class="site-wrapper">
+      <div class="main-wrapper" <% if (typeof showLogin != 'undefined') { %>style="display: none"<% } %>>
 
-      <div class="site-wrapper-inner">
-
-        <div class="cover-container" id="signup-text-inner">
-
-          <div class="inner cover">
-            <h1><strong>Free your <u>links</u>.</strong></h1>
-            <p class="lead">Give your favorite links freedom from your browser. Its fast and as simple as copy/paste.</p>
-            <p class="lead">
-              <a href="#" class="btn btn-lg btn-success" id="signupBtn">Get Started</a>
-            </p>
-          </div>
-
+        <div class="main-inner" id="signup-text-inner">
+        
+          <h1><strong>Free your links.</strong></h1>
+          <p class="lead">Just copy and paste your favorite links to save, share and access them anywhere.</p>
+          <form role="form" action="/auth/local/register" method="post" id="signupForm">
+            <a class="btn btn-block btn-social btn-facebook btn-lg largeFacebook" href="/auth/facebook"><i class="fa fa-facebook"></i> Continue with Facebook</a>
+            <h4 class="text-danger formError" id="signupError" style="display: none">Your password is too short</h4>
+            <div class="form-group has-feedback" id="signupEmailDiv">
+              <input type="text" name="email" class="form-control input-lg" id="signupEmail" placeholder="email address">
+              <input type="hidden" name="username" id="signupUsername" value="">
+            </div>
+            <div class="form-group has-feedback" id="signupPasswordDiv">  
+              <input type="password" name="password" class="form-control input-lg userPassword" id="signupPassword" placeholder="password">
+            </div>
+            <input type="hidden" name="_csrf" value="<%= _csrf %>" />          
+            <div class="form-group">
+             <p class="smalltext">By signing up, I agree to the Terms of Service and Privacy Policy.</p>
+            </div>
+            <button type="submit" id="submitSignup" class="btn btn-lg btn-success">Sign Up</button>
+            <p><br />Already have an account? <a href="#" id="signupBtn">Login</a></p>
+          </form>
+        
         </div>
 
       </div>
       
-      <div class="site-wrapper-inner signup-wrapper" style="display: none">
+      <div class="signin-wrapper" <% if (typeof showLogin === 'undefined') { %>style="display: none"<% } %>>
 
-        <div class="cover-container">
-
-          <div class="inner cover signup-inner">
-            <h4 class="text-danger" id="signupError" style="visibility: hidden">Your password is too short</h4>
-    				<form role="form" action="/auth/local/register" method="post" id="signupForm">
-    				  <div class="form-group has-feedback" id="signupEmailDiv">
-  				      <input type="text" name="email" class="form-control input-lg" id="signupEmail" placeholder="email address">
-                <input type="hidden" name="username" id="signupUsername" value="">
-              </div>
-    				  <div class="form-group has-feedback" id="signupPasswordDiv">  
-  				      <input type="password" name="password" class="form-control input-lg" id="signupPassword" placeholder="password">
-              </div>
-              <input type="hidden" name="_csrf" value="<%= _csrf %>" />          
-    				  <div class="form-group">
-    				   <label>By clicking Sign up, I agree to the Terms of Service and Privacy Policy.</label>
-    				  </div>
-    				  <button type="submit" id="submitSignup" class="btn btn-lg btn-success">Sign Up</button>
-    				  <p><br />Already have an account? <a href="#" >Login</a></p>     
-    				</form>
+        <div class="signin-inner">
+          <% if (reset) { %><script type="text/javascript">window.onload = function() { <% if (reset === 'y') { %>swal("Password Reset!", "Your password has been changed successfully.", "success");<% } else if (reset === 'n') { %>swal("Password Reset Error", "There was an error reseting your password", "error");<% } %>}</script><% } %>
+          <h1><strong>Login to your account.</strong></h1>
+          <p class="lead">Type in the email address and password you signed up with or login with Facebook.</p>
+          <a class="btn btn-block btn-social btn-facebook btn-lg largeFacebook" href="/auth/facebook"><i class="fa fa-facebook"></i> Sign in with Facebook</a>
+  				<form role="form" action="/auth/local" method="post" id="loginForm">
+  				  <div class="form-group has-feedback">
+  			      <input type="text" name="identifier" class="form-control input-lg" id="loginEmail" placeholder="email address">
             </div>
+  				  <div class="form-group has-feedback">  
+  			      <input type="password" name="password" class="form-control input-lg" id="loginPassword" placeholder="password">              
+            </div>
+            <div class="form-group has-feedback">  
+              <div class="row">
+                <div class="col-md-7"><p><input name="remember" type="checkbox" value="1"> Remember me</p></div>
+              </div>
+            </div>            
+            <input type="hidden" name="_csrf" value="<%= _csrf %>" /> 
+  				  <button type="submit" id="submitLogin" class="btn btn-lg btn-success">Sign in</button>
+  				  <p><br />Forgot your password? <a href="/reset" >Reset it</a></p>     
+  				</form>
+        
         </div>
+
       </div>
-    </div>

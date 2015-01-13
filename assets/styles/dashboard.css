@@ -1,0 +1,57 @@
+body {
+	background-color: rgb(31,31,31);
+	background-image: none;
+}
+
+.dashbox {
+	background-color: rgb(61,61,61);
+	color: #FFF;
+	padding: 10px;
+	margin-top: 50px;
+  -webkit-border-radius: 8px 8px 8px 8px;
+  -moz-border-radius: 8px 8px 8px 8px;
+  border-radius: 8px 8px 8px 8px;
+}
+
+.dash-big-text, .dash-small-text {
+	text-align: center;
+	margin: auto;
+}
+
+.dash-big-text {
+	font-size: 100px;
+	margin-bottom: 10px;
+}
+
+.dash-small-text {
+	font-size: 24px;
+	color: #AAA;
+}
+
+.dash-header {
+	font-size: 24px;
+	color: #AAA;	
+}
+
+.dash-link {
+	background: url("/images/dash-link.jpg") top left no-repeat;
+	background-size: 100%;
+}
+
+.dash-user {
+	background: url("/images/dash-user.jpg") top left no-repeat;
+	background-size: 100%;
+}
+
+.dash-link-title, .dash-link-date, .dash-user-email, .dash-user-social {
+	font-size: 20px;
+}
+
+.dash-link-url, .dash-link-user {
+	font-size: 14px;
+	color: #AAA;
+}
+
+.dash-info-row {
+	margin-bottom: 20px;
+}

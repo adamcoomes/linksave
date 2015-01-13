@@ -1,0 +1,51 @@
+          <form role="form" id="profile-edit-form">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+              <h4 class="modal-title">Edit Your Profile</h4>
+            </div>
+            <div class="modal-body" id="main-modal-body">              
+              <div class="form-group">
+                <label for="edit-name">Full Name</label>
+                <input type="text" class="form-control" id="edit-name" value="<%= user.name %>" placeholder="First and Last Name">
+              </div>
+              <div class="form-group">
+                <label for="edit-username">Username</label>
+                <input type="text" class="form-control" id="edit-username" value="<%= user.username %>">
+                <div id="edit-username-check" class="text-danger"></div>
+              </div>
+              <div class="form-group">
+                <label for="edit-email">Email</label>
+                <input type="text" class="form-control" id="edit-email" value="<%= user.email %>">
+                <div id="edit-email-check" class="text-danger"></div>                
+              </div>
+              <div class="form-group">
+                <label for="edit-about">About You</label>
+                <textarea class="form-control" id="edit-about" rows="3"><%= user.about %></textarea>
+              </div>              
+              <div class="form-group">
+                <label for="edit-password">Password</label>
+                <p> <a href="#" id="edit-password">Change your password</a></p>
+                <div id="change-password" style="display: none">
+                  <div id="current-password"><input class="form-control" id="edit-curpass" type="password" placeholder="Current Password"></div>
+                  <div id="edit-password-check" class="text-danger"></div>
+                  <div><input class="form-control" id="edit-newpass" type="password" placeholder="New Password"></div>
+                  <div><input class="form-control" id="edit-newpass-verify" type="password" placeholder="Verify New Password"></div>                                    
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="social-connect">Social Accounts</label>
+                <div><p class="social-connect"><i class="fa fa-facebook-square"></i></p><% if (user.hasFacebook) { %><p class="social-link"><i class="fa fa-check"></i></p><p class="social-link-p"><a id="unlink-facebook" href="#">Unlink Facebook</a></p><% } else { %><p class="social-link-p"><a id="link-facebook" href="/user/link">Link Facebook</a></p><% } %></div><br />
+              </div>
+              <div class="form-group">
+                <label for="delete-account">Delete Account</label>
+                <p class="delete-account"><a href="#" id="delete-account-link">Delete your Linksave account</a></p>
+                <div id="delete-confirm" style="display: none">
+                  <div id="delete-confirm-div"><a href="#" id="delete-confirm-link">I want to delete my account and ALL of my content</a></div>                            
+                </div>
+              </div>                 
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+              <input type="submit" id="link-edit-submit" class="btn btn-primary" value="Save changes">
+            </div>
+          </form>  

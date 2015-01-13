@@ -36,7 +36,17 @@ module.exports.routes = {
 	  controller: 'home',
 	  action: 'index'
   },
-  
+
+  '/dashboard': 'HomeController.dashboard',
+
+  'get /verify': 'UserController.verify',
+
+  '/terms': 'HomeController.terms',
+
+  '/privacy': 'HomeController.privacy',
+
+  '/reset': 'HomeController.reset',
+
   'get /login': 'AuthController.login',
   'get /logout': 'AuthController.logout',
   'get /register': 'AuthController.register',
@@ -47,7 +57,11 @@ module.exports.routes = {
   'get /auth/:provider': 'AuthController.provider',
   'get /auth/:provider/callback': 'AuthController.callback',
 
-  'get /view/:title': 'LinkController.view'
+  "r|^/(\\d+)$|id": {
+    controller: 'link',
+    action: 'visit',
+    skipAssets: true
+  } 
   
   /***************************************************************************
   *                                                                          *

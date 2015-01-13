@@ -14,10 +14,14 @@ module.exports = {
     username: { type: 'string', unique: true },
     email: { type: 'email',  unique: true },
     photo: { type: 'string' },
-    first_name: { type: 'string' },
-    last_name: { type: 'string' },
+    about: { type: 'text' },
+    name: { type: 'string' },
+    verified: { type: 'boolean', defaultsTo: false },
+    verifyToken: { type: 'string' },
+    resetToken: { type: 'string' },
+    admin: { type: 'boolean', defaultsTo: false },
     links: { collection: 'link', via: 'user' },
-    tags: { collection: 'tag', via: 'user' },    
+    tags: { collection: 'tag', via: 'user' },
     passports: { collection: 'Passport', via: 'user' }
   }
 };

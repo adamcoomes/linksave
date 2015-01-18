@@ -134,14 +134,14 @@ $(document).ready(function() {
 		if (!embed) {		
 			var shotFile = '/webshots/' + infoId + '.jpg';
 			var defaultImg = '/webshots/default.jpg';
-			var url = $('#link-'+linkId).find('link-href').text();
+			var url = $('#link-'+linkId).find('.link-href').text();
 			$.ajax({
 		    url: shotFile,
 		    type:'HEAD',
 		    data: {_csrf: csrf},
 	  		error: function() {
 	  			updateWebshotImage(defaultImg, linkId);
-	  			updateWebshot(url, infoId, linkId, 0);
+	  			updateWebshot(url, infoId, linkId, false);
 	  		},
 	  		success: function() {
 	      	updateWebshotImage(shotFile, linkId);
@@ -151,17 +151,29 @@ $(document).ready(function() {
 	}
 
 	function updateWebshotImage(shotFile, linkId) {
-		$('#link-'+linkId).find(".link-webshot img").attr("src", shotFile);
+		$('#link-'+linkId).find(".link-webshot-img").attr("src", shotFile);
 		makeZoomable(linkId);
 	}	
 
 	function updateWebshot(url, infoId, linkId, time) {
 		var webshotData = { url: url, id: infoId, time: time, _csrf: csrf };
 
-		$.post("/api/link/webshot", webshotData).done(function(shotFile) {
-			if (shotFile != 'error')
-				checkWebshotExists(linkId, infoId);
-		});
+		$.ajax({ type: 'POST', url: "/api/link/webshot", data: webshotData, complete: function() {
+			checkWebshotExists(linkId, infoId);
+		}});
+
+		// (function poll() {
+  //  		setTimeout(function() {
+  //      $.ajax({ url: "server", success: function(data) {
+  //           sales.setValue(data.value);
+  //      }, dataType: "json", complete: poll });
+  //   	}, 30000);
+		// })();
+
+		// $.post("/api/link/webshot", webshotData).done(function(response) {
+		// 	if (response === 'done')
+		// 		checkWebshotExists(linkId, infoId);
+		// });
 	}
 
 	function checkWebshotTime() {
@@ -174,14 +186,14 @@ $(document).ready(function() {
 				var now = new Date();
 				var updated = new Date(updateDate);
 				var sinceUpdate = parseInt(now.valueOf()) - parseInt(updated.valueOf());
-				var checkAgainst = 1000 * 60;
+				var checkAgainst = 1000 * 60 * 24 * 30;
 
 
 				if (sinceUpdate > checkAgainst) {
 					var url = $(this).find('.link-href').text();
 					var infoId = $(this).find('.link-info').text();
 
-					updateWebshot(url, infoId, linkId);
+					updateWebshot(url, infoId, linkId, true);
 				}
 			}
 		});
@@ -574,7 +586,7 @@ $(document).ready(function() {
 				var image = 'webshots/' + imageId + '.jpg';			
 				
 				$(obj).find('.link-webshot').zoom({url: image, magnify: 1, callback: function() {
-					$(this).wrap('<a class="link-visit link-visit-' + id + '" href="' + url + '" title="' + url + '" target="_blank"></a>');
+					$(this).wrap('<a class="link-visit link-visit-' + id + '" href="' + url + '" title="' + url + '" style="cursor: pointer" target="_blank"></a>');
 				}});
 			}	
 		}
@@ -629,6 +641,7 @@ $(document).ready(function() {
 	});
 
 	loadLinks(false, true, page);
+	checkWebshotTime();
 
 	makeTagHovers();
 

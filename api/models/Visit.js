@@ -1,5 +1,8 @@
 module.exports = {
 
+  // Enforce model schema in the case of schemaless databases
+  schema: true, 
+
   attributes: {
   	user: { model: 'user' },
   	link: { model: 'link' },

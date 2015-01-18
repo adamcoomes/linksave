@@ -71,11 +71,11 @@ module.exports = {
 		});
 	},
 
-	destroyAll: function(req, res) {
-		Tag.destroy({ id: { '>=': 1 }}, function(err, result) { 
-			res.send('done');
-		});
-	} 
+	// destroyAll: function(req, res) {
+	// 	Tag.destroy({ id: { '>=': 1 }}, function(err, result) { 
+	// 		res.send('done');
+	// 	});
+	// } 
 	
 };
 

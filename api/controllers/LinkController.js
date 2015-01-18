@@ -5,7 +5,8 @@
  * @help        :: See http://links.sailsjs.org/docs/controllers
  */
 
-var webshot = require('webshot');
+var request = require('request');
+var http = require('http');
 var fs = require('fs');
 var urltitle = require('url-title');
 var urltotitle = require('url-to-title');
@@ -13,6 +14,59 @@ var embed = require('embed-video');
 var uaparser = require('ua-parser-js');
 var errors = require('custom/errors');
 errors.setController('link');
+
+function takeWebshot(res, data) {
+
+	console.log(JSON.stringify(data));
+
+	// Set the headers
+	var headers = {
+	    'User-Agent':       'Super Agent/0.0.1',
+	    'Content-Type':     'application/x-www-form-urlencoded'
+	}
+
+	var qs = {'p2i_url': data.url, 'p2i_key': '1cfc024d9cc62acd', 'p2i_size': '640x480', 'p2i_screen': '640x480'};
+
+	if (data.checkTime) {
+		qs.p2i_refresh = 1;
+	}
+
+	// Configure the request
+	var options = {
+	    url: 'http://api.page2images.com/restfullink',
+	    method: 'GET',
+	    headers: headers,
+	    qs: qs
+	}
+
+	// Start the request
+	request(options, function (error, response, body) {
+	    if (!error && response.statusCode == 200) {
+	        var result = JSON.parse(body);	    	
+	    		if (result.status === 'finished') {
+	        	var imgfile = fs.createWriteStream(data.filePathFull);
+						request({url: result.image_url, method: 'GET'}).on('end', function() {
+							imgfile.on('finish', function() {
+								res.send('done');
+							});
+						}).pipe(imgfile);
+	    		} else {
+	    			setTimeout(takeWebshot(res, data), 60000);
+	    		}
+	    }
+	});
+
+// var url = 'http://api.page2images.com/restfullink?p2i_url=' + data.url + '&p2i_key=1cfc024d9cc62acd&p2i_size=640x480&p2i_screen=640x480';
+
+// request
+//   .get(url)
+//   .on('response', function(response) {
+//     console.log(response.statusCode) // 200
+//     console.log(response.headers['content-type']) // 'image/png'
+//   });
+  // .pipe(request.put('http://mysite.com/img.png'))	
+  
+}
 
 function checkWebshot(url, id, checkTime, res) {
 	var ext = 'jpg';
@@ -40,7 +94,7 @@ function updateWebshot(res, data) {
 				data.updated = _.clone(updated);
 				var now = new Date();
 				var sinceUpdate = parseInt(now.valueOf()) - parseInt(updated.valueOf());
-				var checkAgainst = 1000 * 60;
+				var checkAgainst = 1000 * 60 * 24 * 30;
 
 				if (sinceUpdate > checkAgainst) {
 					Linkdata.update({id: data.id}, {updatedAt: now}, function(err, updated){});
@@ -60,31 +114,32 @@ function updateWebshot(res, data) {
 	}
 }
 
-function takeWebshot(res, data) {
-	webshot(data.url, data.filePathFull, {windowSize: {width: 640, height: 480}, shotSize: {width: 640, height: 480}, phantomConfig: {'ssl-protocol': 'any'}, defaultWhiteBackground: true, quality: 80, streamType: 'jpg'}, function(err) {
-		setTimeout(function(){ 
-  		if (err) {
-				errors.log(err, 'taking webshot', '', data.id);
-  			Linkdata.update({id: data.id}, {updatedAt: data.updated}, function(err2, updated) {
-  				if (err2)
-  					errors.log(err, 'resetting linkdata update time after failed webshot', '', data.id);
-  			});
-  			console.log(err);
+// function takeWebshot(res, data) {
 
-  			if (res)
-					res.send('error');
-  		}
-			else {
-				if (res)
-	  			res.send(data.filePath);
-			}
+// 	webshot(data.url, data.filePathFull, {windowSize: {width: 640, height: 480}, shotSize: {width: 640, height: 480}, phantomConfig: {'ssl-protocol': 'any'}, defaultWhiteBackground: true, quality: 80, streamType: 'jpg'}, function(err) {
+// 		setTimeout(function(){ 
+//   		if (err) {
+// 				errors.log(err, 'taking webshot', '', data.id);
+//   			Linkdata.update({id: data.id}, {updatedAt: data.updated}, function(err2, updated) {
+//   				if (err2)
+//   					errors.log(err, 'resetting linkdata update time after failed webshot', '', data.id);
+//   			});
+//   			console.log(err);
 
-		}, 3000);
-	});
-}
+//   			if (res)
+// 					res.send('error');
+//   		}
+// 			else {
+// 				if (res)
+// 	  			res.send(data.filePath);
+// 			}
+
+// 		}, 3000);
+// 	});
+// }
 
 module.exports = {
-	
+
 	add: function(req, res) {
 
 		if (!req.user) {
@@ -226,7 +281,7 @@ module.exports = {
 		var time = req.body.time;
 
 		if (!time)
-			time = true;
+			time = false;
 
 		checkWebshot(url, id, time, res);
 	},
@@ -427,13 +482,13 @@ module.exports = {
 
 	//REMOVE THIS BEFORE PRODUCTION
 
-	destroyAll: function(req, res) {
-		Link.destroy({ id: { '>': 1 }}, function(err, result) {
-			Linkdata.destroy({ id: { '>': 1 }}, function(err, result) {
-				res.send('done');
-			});
-		});
+	// destroyAll: function(req, res) {
+	// 	Link.destroy({ id: { '>': 1 }}, function(err, result) {
+	// 		Linkdata.destroy({ id: { '>': 1 }}, function(err, result) {
+	// 			res.send('done');
+	// 		});
+	// 	});
 
-	} 
+	// } 
 }
 

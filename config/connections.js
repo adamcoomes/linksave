@@ -43,6 +43,7 @@ module.exports.connections = {
   mysqlDB: {
     adapter: 'sails-mysql',
     host: 'localhost',
+    port: 3306,
     user: 'linksave_admin',
     password: 'run4y0ur$',
     database: 'linksave'
@@ -56,13 +57,13 @@ module.exports.connections = {
   * Run: npm install sails-mongo                                             *
   *                                                                          *
   ***************************************************************************/
-  someMongodbServer: {
+  mongoDB: {
     adapter: 'sails-mongo',
     host: 'localhost',
     port: 27017,
-    // user: 'username',
-    // password: 'password',
-    // database: 'your_mongo_db_name_here'
+    user: 'linksave_admin',
+    password: 'run4y0ur$',
+    database: 'linksave'
   },
 
   /***************************************************************************
@@ -74,13 +75,13 @@ module.exports.connections = {
   *                                                                          *
   *                                                                          *
   ***************************************************************************/
-  somePostgresqlServer: {
-    adapter: 'sails-postgresql',
-    host: 'YOUR_POSTGRES_SERVER_HOSTNAME_OR_IP_ADDRESS',
-    user: 'YOUR_POSTGRES_USER',
-    password: 'YOUR_POSTGRES_PASSWORD',
-    database: 'YOUR_POSTGRES_DB'
-  }
+  // somePostgresqlServer: {
+  //   adapter: 'sails-postgresql',
+  //   host: 'YOUR_POSTGRES_SERVER_HOSTNAME_OR_IP_ADDRESS',
+  //   user: 'YOUR_POSTGRES_USER',
+  //   password: 'YOUR_POSTGRES_PASSWORD',
+  //   database: 'YOUR_POSTGRES_DB'
+  // }
 
 
   /***************************************************************************

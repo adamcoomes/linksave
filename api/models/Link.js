@@ -1,4 +1,8 @@
 module.exports = {
+
+  // Enforce model schema in the case of schemaless databases
+  schema: true, 
+
 	attributes: {
   	title: { type: 'string' },
   	visits: { type: 'integer', defaultsTo: 0 },

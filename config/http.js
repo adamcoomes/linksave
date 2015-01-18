@@ -35,6 +35,7 @@ module.exports.http = {
       'cookieParser',
       'session',
       'myRequestLogger',
+      'checkBaseURL',
       'bodyParser',
       'handleBodyParserError',
       'compress',
@@ -54,15 +55,21 @@ module.exports.http = {
   *                                                                           *
   ****************************************************************************/
 
-    myRequestLogger: function (req, res, next) {
-        // console.log("Requested :: ", req.method, req.url);
+    // myRequestLogger: function (req, res, next) {
+    //     // console.log("Requested :: ", req.method, req.url);
+    // },
+
+    checkBaseURL: function (req, res, next) {
         var url = req.headers['host'];
-        if (url.indexOf('savd.link') != '-1')
-           if (!req.url.match(/^\/(\d+)$/i))
-              res.redirect('/');
-        else
-           return next();
-    }
+        if (url.indexOf('savd.link') != '-1') {
+          if (!req.url.match(/^\/(\d+)$/i))
+              res.redirect('https://linksave.com');
+          else
+             return next();
+        } else {
+          return next();
+        }
+    },
 
 
   /***************************************************************************

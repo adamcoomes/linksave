@@ -156,19 +156,9 @@ $(document).ready(function() {
 	}	
 
 	function updateWebshot(url, infoId, linkId, time) {
-		var webshotData = { url: url, id: infoId, time: time, _csrf: csrf };
+		var webshotData = { url: url, linkId: linkId, infoId: infoId, time: time, _csrf: csrf };
 
-		$.ajax({ type: 'POST', url: "/api/link/webshot", data: webshotData, complete: function() {
-			checkWebshotExists(linkId, infoId);
-		}});
-
-		// (function poll() {
-  //  		setTimeout(function() {
-  //      $.ajax({ url: "server", success: function(data) {
-  //           sales.setValue(data.value);
-  //      }, dataType: "json", complete: poll });
-  //   	}, 30000);
-		// })();
+		$.post("/api/link/webshot", webshotData).done(function () {});
 
 		// $.post("/api/link/webshot", webshotData).done(function(response) {
 		// 	if (response === 'done')
@@ -642,6 +632,10 @@ $(document).ready(function() {
 
 	loadLinks(false, true, page);
 	checkWebshotTime();
+
+	io.socket.on('webshotSock', function(data) {
+		checkWebshotExists(data.linkId, data.infoId);
+	});	
 
 	makeTagHovers();
 

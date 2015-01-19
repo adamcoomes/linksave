@@ -25,7 +25,9 @@ function takeWebshot(res, data) {
 	    'Content-Type':     'application/x-www-form-urlencoded'
 	}
 
-	var qs = {'p2i_url': data.url, 'p2i_key': '1cfc024d9cc62acd', 'p2i_size': '640x480', 'p2i_screen': '640x480'};
+	var p2i_callback = 'https://linksave.com/api/link/webshotCallback/?u=' + data.userId + '&id=' + data.id + '&link=' + data.link + '&s=' + data.socketId + '&_csrf=' + data.csrf;
+
+	var qs = {'p2i_url': data.url, p2i_key: '1cfc024d9cc62acd', p2i_size: '640x480', p2i_screen: '640x480', p2i_callback: p2i_callback};
 
 	if (data.checkTime) {
 		qs.p2i_refresh = 1;
@@ -41,19 +43,7 @@ function takeWebshot(res, data) {
 
 	// Start the request
 	request(options, function (error, response, body) {
-	    if (!error && response.statusCode == 200) {
-	        var result = JSON.parse(body);	    	
-	    		if (result.status === 'finished') {
-	        	var imgfile = fs.createWriteStream(data.filePathFull);
-						request({url: result.image_url, method: 'GET'}).on('end', function() {
-							imgfile.on('finish', function() {
-								res.send('done');
-							});
-						}).pipe(imgfile);
-	    		} else {
-	    			setTimeout(takeWebshot(res, data), 60000);
-	    		}
-	    }
+	    if (!error && response.statusCode == 200) {}
 	});
 
 // var url = 'http://api.page2images.com/restfullink?p2i_url=' + data.url + '&p2i_key=1cfc024d9cc62acd&p2i_size=640x480&p2i_screen=640x480';
@@ -66,21 +56,6 @@ function takeWebshot(res, data) {
 //   });
   // .pipe(request.put('http://mysite.com/img.png'))	
   
-}
-
-function checkWebshot(url, id, checkTime, res) {
-	var ext = 'jpg';
-	var filePath = 'webshots/' + id + '.' + ext;
-	var filePathFull = 'assets/' + filePath;
-
-	var webshotData = {id: id, url: url, filePath: filePath, filePathFull: filePathFull, exists: false, checkTime: checkTime};
-
-	fs.exists(filePathFull, function(exists) {
-		if (exists)
-			webshotData.exists = true;
-
-		updateWebshot(res, webshotData);
-	});	
 }
 
 function updateWebshot(res, data) {
@@ -139,6 +114,11 @@ function updateWebshot(res, data) {
 // }
 
 module.exports = {
+
+	// test1: function(req, res) {
+	// 	var sockId = sails.sockets.id(req.socket);
+	// 	sails.sockets.emit(sockId, 'testsock', 'omgomgomg');
+	// },
 
 	add: function(req, res) {
 
@@ -276,15 +256,44 @@ module.exports = {
 	},
 
 	webshot: function(req, res) {
-		var url = req.body.url;
-		var id = req.body.id;
+		var id = req.body.infoId;
+		var socketId = sails.sockets.id(req.socket);
+		var filePath = 'webshots/' + id + '.jpg';
+		var filePathFull = 'assets/' + filePath;
 		var time = req.body.time;
 
 		if (!time)
 			time = false;
 
-		checkWebshot(url, id, time, res);
+		var webshotData = {id: id, url: req.body.url, socketId: socketId, linkId: req.body.linkId, filePath: filePath, filePathFull: filePathFull, exists: false, userId: req.user.id, csrf: req.body._csrf, checkTime: time};
+
+		fs.exists(filePathFull, function(exists) {
+			if (exists)
+				webshotData.exists = true;
+
+			updateWebshot(res, webshotData);
+		});
 	},
+
+	webshotCallback: function(req, res) {
+		var userId = req.body.u;
+		var infoId = req.body.id;
+		var linkId = req.body.link;
+		var socketId = req.body.s;
+		var pathFull = 'assets/webshots/' + id + '.jpg';
+
+		if (req.body.status === 'finished') {
+			var imgfile = fs.createWriteStream(pathFull);
+
+			request({url: req.body.image_url, method: 'GET'}).on('end', function() {
+				imgfile.on('finish', function() {
+					res.send('done');
+					sails.socket.emit(socketId, 'webshotSock', {linkId: linkId, infoId: infoId});
+				});
+			}).pipe(imgfile);
+		}
+	},
+
 
 	load: function(req, res) {
 		if (!req.user) {

@@ -6,6 +6,11 @@ $(document).ready(function () {
 
 	var csrf = '';
 
+       function validateEmail(email) {
+            var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            return re.test(email);
+        }
+
 	$.ajax({
 		type: 'GET',
 		url: '/csrfToken',
@@ -19,13 +24,18 @@ $(document).ready(function () {
 	function validateForm(email, password, verifyPassword) {
 		error = false;
 		if (email) {
+			if (!validateEmail(email)) {
+				error = true;
+				$(".formError").text("That email address is in invalid.").fadeIn(200);
+			} else {
 			var data = { email: email, _csrf: csrf };
-			$.post("/api/user/validate", data).done(function(result) {
-				if (!result.email.length) {
+			$.ajax({ type: 'GET', url: "/api/user/checkEmail", data: data, async: false }).done(function(result) {
+				if (result === 'exists') {
 					$(".formError").text("That email address is in use.").fadeIn(200);
 					error = true;
 				}
 			});
+			}
 		}
 		
 		if (password) {
@@ -71,9 +81,15 @@ $(document).ready(function () {
 
 	$('#signupForm').submit(function() {
 		var form = this;
-		if (error)
-			return false;
+		var email = $('#signupEmail').val();
+		var pass = $('.userPassword').val();	
 
+		if ((email.length < 3) || (pass.length < 4))
+			return false;
+	
+		if ((!validateForm($('#signupEmail').val(), $('.userPassword').val())) || error)
+			return false;
+			
 		var emailVal = $("#signupEmail").val();
 		var userUnique = false;
 		var emailSplit = emailVal.split('@');

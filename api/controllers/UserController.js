@@ -19,20 +19,24 @@ module.exports = {
   		data[i] = values;
   	}
 
-  	if (data) {
-	  	User.find(data, function(err, users) {
+  	var compare = _.clone(data);
+	var senddata = {};
+
+	if (data) {
+	  	User.find(data).exec(function(err, users) {
 
         if (err)
           errors.log(err, 'retrieving users for validation');
   
 				for (var i=0; i<users.length; i++) {
 						for (var key in users[i]) {
-							if (data.hasOwnProperty(key)) 
-								data[key].splice(data[key].indexOf(users[i][key]),1);
+							if (compare.hasOwnProperty(key)) 
+								compare[key].splice(compare[key].indexOf(users[i][key]),1);
 						}
 				}
+				console.log(compare);
 				
-				res.send(data);
+				res.send(compare);
 			
 			});
   	}
@@ -74,13 +78,16 @@ module.exports = {
   },
 
   checkEmail: function(req, res) {
-    var user = req.user;
+    var user = {};
     var email = req.query.email;
 
-    if ((user.id) && (user.email != email)) {
+    if (req.hasOwnProperty('user'))
+	user = req.user;
+
+    if (((user.hasOwnProperty('id') && user.email != email)) || (!user.hasOwnProperty('id'))) {
       User.findOne({email: email}).exec(function(err, result) {
         if (err)
-          errors.log(err, 'checking if email ' + email + ' exists', user.id);
+          errors.log(err, 'checking if email ' + email + ' exists');
 
         if (result)
           res.send('exists');
@@ -455,9 +462,8 @@ module.exports = {
     if (req.user) {
       if (req.user.admin) {
         var userCount = new Object();
-        var date = new Date();
-        date.setDate(date.getDate()-1);
-        var yesterday = date.toJSON();
+        var yesterday = new Date();
+        yesterday.setDate(yesterday.getDate()-1);
         User.count().exec(function(err, result) {
           userCount.total = result;
           User.count({ createdAt: { '>=': yesterday }}).exec(function(err, today) {

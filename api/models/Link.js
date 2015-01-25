@@ -4,6 +4,7 @@ module.exports = {
   schema: true, 
 
 	attributes: {
+	shortid: { type: 'string', defaultsTo: null },
   	title: { type: 'string' },
   	visits: { type: 'integer', defaultsTo: 0 },
   	position: { type: 'integer', defaultsTo: 0 },

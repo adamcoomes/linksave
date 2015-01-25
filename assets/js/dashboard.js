@@ -37,18 +37,17 @@ $(document).ready(function() {
 	function updateDash() {
 		var data={_csrf: csrf};
 
-		$.get('/user/getUserCount', data).done(function(users) {
+		$.get('/api/user/getUserCount', data).done(function(users) {
 			$("#users-today").text(users.today);
 			$("#users-total").text(users.total);
 		});
 
-		$.get('/link/getLinkCount', data).done(function(linkNum) {
+		$.get('/api/link/getLinkCount', data).done(function(linkNum) {
 			$("#links-today").text(linkNum.today);
 			$("#links-total").text(linkNum.total);
 		});
 
-		$.get('/link/getLatestLinks', data).done(function(links) {
-			$("#dash-link-list").html('');
+		$.get('/api/link/getLatestLinks', data).done(function(links) {
 			var linkHTML = '';
 			links.forEach(function(link) {
 				var tags = '';
@@ -67,8 +66,8 @@ $(document).ready(function() {
 			links = '';			
 		});
 
-		$.get('/user/getLatestUsers', data).done(function(users) {
-			$("#dash-user-list").html('');
+		$.get('/api/user/getLatestUsers', data).done(function(users) {
+			var userHTML = '';
 
 			users.forEach(function(user) {
 				var social = '';
@@ -82,8 +81,10 @@ $(document).ready(function() {
 				var createdAt = new Date(user.createdAt);
 				var timeAgo = timeSince(createdAt);
 
-				$("dash-user-list").prepend('<div class="dash-info-row row"><div class="dash-info-left col-md-9"><span class="dash-user-email">' + user.email + '</span></div><div class="col-md-3 dash-info-right"><span class="dash-user-social">' + timeAgo + ' - ' + social + '</span></div></div>');
-			});			
+				userHTML += '<div class="dash-info-row row"><div class="dash-info-left col-md-9"><span class="dash-user-email">' + user.email + '</span></div><div class="col-md-3 dash-info-right"><span class="dash-user-social">' + timeAgo + ' - ' + social + '</span></div></div>';
+			});
+
+			$("#dash-user-list").html(userHTML);
 		});	
 
 		setTimeout(function(){updateDash();},10000);	

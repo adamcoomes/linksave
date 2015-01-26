@@ -13,9 +13,10 @@ var urltotitle = require('url-to-title');
 var embed = require('embed-video');
 var uaparser = require('ua-parser-js');
 var errors = require('custom/errors');
+var shortId = require('short-mongo-id');
 errors.setController('link');
 
-function takeWebshot(res, data) {
+function takeWebshot(req, res, data) {
 
 	console.log(JSON.stringify(data));
 
@@ -25,7 +26,7 @@ function takeWebshot(res, data) {
 	    'Content-Type':     'application/x-www-form-urlencoded'
 	}
 
-	var p2i_callback = 'https://linksave.com/api/link/webshotCallback/?u=' + data.userId + '&id=' + data.id + '&link=' + data.link + '&s=' + data.socketId + '&_csrf=' + data.csrf;
+	var p2i_callback = 'https://linksave.com/p2icallback?id=' + data.id + '&link=' + data.linkId + '&s=' + encodeURIComponent(data.socketId);
 
 	var qs = {'p2i_url': data.url, p2i_key: '1cfc024d9cc62acd', p2i_size: '640x480', p2i_screen: '640x480', p2i_callback: p2i_callback};
 
@@ -37,14 +38,26 @@ function takeWebshot(res, data) {
 	var options = {
 	    url: 'http://api.page2images.com/restfullink',
 	    method: 'GET',
-	    headers: headers,
 	    qs: qs
 	}
 
 	// Start the request
 	request(options, function (error, response, body) {
-	    if (!error && response.statusCode == 200) {}
-	});
+	    if (!error && response.statusCode == 200) {
+		var json = JSON.parse(body);
+		if (json.hasOwnProperty('result')) {
+			console.log(json.result);
+			if (json.result === 'finished') {
+				res.send('done');
+				console.log('image already there');
+			}
+		}
+		else {
+			res.send('processing');
+			console.log('processing...');
+		} 
+	   }
+	}).end();
 
 // var url = 'http://api.page2images.com/restfullink?p2i_url=' + data.url + '&p2i_key=1cfc024d9cc62acd&p2i_size=640x480&p2i_screen=640x480';
 
@@ -58,7 +71,7 @@ function takeWebshot(res, data) {
   
 }
 
-function updateWebshot(res, data) {
+function updateWebshot(req, res, data) {
 	if (data.exists) {
 		if (data.checkTime) {
 			Linkdata.findOne(data.id).exec(function(err, linkdata) {
@@ -73,19 +86,22 @@ function updateWebshot(res, data) {
 
 				if (sinceUpdate > checkAgainst) {
 					Linkdata.update({id: data.id}, {updatedAt: now}, function(err, updated){});
-					takeWebshot(res, data);
+					takeWebshot(req, res, data);
 				}
 				else {
 					if (res)
-						res.send(data.filePath);
+						res.send('done');
 				}
 			});
 		} else {
 			if (res)
-				res.send(data.filePath);
+				res.send('done');
+
+			console.log('data exists... done');
 		}
 	} else {
-		takeWebshot(res, data);
+		console.log('updating webshot...');
+		takeWebshot(req, res, data);
 	}
 }
 
@@ -146,7 +162,14 @@ module.exports = {
 				
 				else {
 					save.id = newlink.id;
-					res.send(save);
+					var short = shortId(save.id);
+					save.shortid = short;
+                                        Link.update({id: save.id}, {shortid: short}, function(shortErr, shortResult) {
+                                        	if (shortErr)
+                                                	errors.log(shortErr, 'shortening link', save.id);
+
+                                               	res.send(save);
+                                        });
 				}
 			});
 		};
@@ -208,8 +231,8 @@ module.exports = {
 						Linkdata.create(data).exec(function(dataerr, result) {
 							if (dataerr)
 								errors.log(dataerr, 'adding link data for ' + url, req.user.id);
-
-							addLink(result);
+	
+                                                	addLink(result);
 						});
 				  } else {
 				  	res.send('error');
@@ -256,41 +279,55 @@ module.exports = {
 	},
 
 	webshot: function(req, res) {
-		var id = req.body.infoId;
-		var socketId = sails.sockets.id(req.socket);
+		var id = req.param('infoId');
 		var filePath = 'webshots/' + id + '.jpg';
 		var filePathFull = 'assets/' + filePath;
-		var time = req.body.time;
+		var time = req.param('time');
+		var socketId = sails.sockets.id(req.socket);
+		//sails.sockets.join(req.socket, id);
+			
 
 		if (!time)
 			time = false;
 
-		var webshotData = {id: id, url: req.body.url, socketId: socketId, linkId: req.body.linkId, filePath: filePath, filePathFull: filePathFull, exists: false, userId: req.user.id, csrf: req.body._csrf, checkTime: time};
+		var webshotData = {id: id, url: req.param('url'), linkId: req.param('linkId'), socketId: socketId, filePath: filePath, filePathFull: filePathFull, exists: false, userId: req.user.id, checkTime: time};
 
 		fs.exists(filePathFull, function(exists) {
 			if (exists)
 				webshotData.exists = true;
 
-			updateWebshot(res, webshotData);
+			updateWebshot(req, res, webshotData);
 		});
 	},
 
 	webshotCallback: function(req, res) {
-		var userId = req.body.u;
-		var infoId = req.body.id;
-		var linkId = req.body.link;
-		var socketId = req.body.s;
-		var pathFull = 'assets/webshots/' + id + '.jpg';
+		var infoId = req.query.id;
+		var linkId = req.query.link;
+		var socketId = decodeURIComponent(req.query.s);
+		var pathFull = process.cwd() + '/assets/webshots/' + infoId + '.jpg';
+		var result = JSON.parse(req.body.result);
+		var url = decodeURIComponent(result.image_url);
+	
+		console.log(JSON.stringify(req.query));
+		console.log(JSON.stringify(req.body));
+		console.log(result.status);
+		console.log(url);		
 
-		if (req.body.status === 'finished') {
+		if (result.status === 'finished') {
 			var imgfile = fs.createWriteStream(pathFull);
-
-			request({url: req.body.image_url, method: 'GET'}).on('end', function() {
-				imgfile.on('finish', function() {
-					res.send('done');
-					sails.socket.emit(socketId, 'webshotSock', {linkId: linkId, infoId: infoId});
+			var tmpPath = process.cwd() + '/.tmp/public/webshots/' + infoId + '.jpg';
+			console.log(pathFull);
+			request({url: url, 'encoding': null}).pipe(imgfile);
+                        
+			imgfile.on('finish', function() {
+				var tmpfile = fs.createWriteStream(tmpPath);
+				fs.createReadStream(pathFull).pipe(tmpfile);
+				tmpfile.on('finish', function() {
+					console.log('done');
+					sails.sockets.emit(socketId, 'webshotSock', {linkId: linkId, infoId: infoId});
+					res.end();
 				});
-			}).pipe(imgfile);
+                        });	
 		}
 	},
 
@@ -393,11 +430,13 @@ module.exports = {
 	// 	});
 	// },
 
-	visit: function(req, res) {
-		res.locals.token = req.csrfToken();
-		var linkId = parseInt(req.param('id'));
+	visit: function(req, res) {;
+		var shortId = req.param('id');
 		var host = req.headers['host'];
-		
+		if (!shortId) {
+			res.redirect('/');
+			res.end();
+		}
 		var visit = new Object();
 		var parser = new uaparser();
 		var agentData = parser.setUA(req.headers['user-agent']).getResult();
@@ -405,32 +444,44 @@ module.exports = {
 		var url = '';
 		var visits = 0;
 
-		Link.findOne(linkId).populate('info').exec(function(err, link) {
-			if (link) {
-				url = link.info.url;
-				visits = link.visits;
-				visit.link = linkId;
-				visit.ip = req.connection.remoteAddress;
-				visit.referer = req.header('Referer');
-				visit.language = req.headers['accept-language'];
-				visit.browserName = agentData.browser.name;
-				visit.browserVersion = agentData.browser.version;
-				visit.osName = agentData.os.name;
-				visit.osVersion = agentData.os.version;
-				visit.user = req.user;
+		console.log(shortId);
 
-				Visit.create(visit).exec(function (err, data) {
-					visits+=1;
-					Link.update({id: linkId}, {visits: visits}, function(err, visitedLink) {
-						if (ajax)
-							res.send('done');
-						else
-							res.redirect(url);
+		Link.findOne({shortid: shortId}).populate('info').exec(function(err, link) {
+			if (link.hasOwnProperty('id')) {
+				if (link.id) {
+					var linkId = link.id;
+					url = link.info.url;
+					visits = link.visits;
+					visit.link = linkId;
+					visit.ip = req.connection.remoteAddress;
+					visit.referer = req.header('Referer');
+					visit.language = req.headers['accept-language'];
+					visit.browserName = agentData.browser.name;
+					visit.browserVersion = agentData.browser.version;
+					visit.osName = agentData.os.name;
+					visit.osVersion = agentData.os.version;
+					if (req.hasOwnProperty('user'))
+						visit.user = req.user;
+					else
+						visit.user = null;
+
+					Visit.create(visit).exec(function (err, data) {
+						visits+=1;
+						Link.update({id: linkId}, {visits: visits}, function(err, visitedLink) {
+							if (ajax)
+								res.send('done');
+							else {
+								res.redirect(url);
+								res.end();
+							}
+						});
 					});
-				});
+				}
+				else {
+					res.redirect('/');
+					res.end();
+				}			
 			}
-			else
-				res.redirect('/');		
 		});
 	},
 
@@ -438,10 +489,8 @@ module.exports = {
     if (req.user) {
       if (req.user.admin) {
         var linkCount = new Object();
-        var date = new Date();
-        date.setDate(date.getDate()-1);
-        var yesterday = date.toJSON();
-        console.log(yesterday);
+        var yesterday = new Date();
+        yesterday.setDate(yesterday.getDate()-1);
         Link.count().exec(function(err, result) {
           linkCount.total = result;
           Link.count({ createdAt: { '>=': yesterday }}).exec(function(err, today) {

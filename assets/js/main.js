@@ -16,6 +16,7 @@ $(document).ready(function() {
 	var page = 0;
 	var done = false;
 	var csrf = '';
+	var baseURL = location.protocol + "//" + location.host;
 
 	$.ajax({
 		type: 'GET',
@@ -86,8 +87,10 @@ $(document).ready(function() {
 
 				if (link.embed)
 					$('#link-' + id).find(".link-webshot").html(link.embed);
+				//else
+					//checkWebshotExists(link.info.id, id);				
 				else
-					checkWebshotExists(id, link.info.id);				
+					makeZoomable(id);
 			});
 
 			if (layout) {
@@ -128,26 +131,41 @@ $(document).ready(function() {
 		$(".alert").alert().show();
 	}
 
-	function checkWebshotExists(linkId, infoId) {
-		var embed = $('#link-'+linkId).find('iframe').length;
-
-		if (!embed) {		
-			var shotFile = '/webshots/' + infoId + '.jpg';
-			var defaultImg = '/webshots/default.jpg';
-			var url = $('#link-'+linkId).find('.link-href').text();
-			$.ajax({
-		    url: shotFile,
-		    type:'HEAD',
-		    data: {_csrf: csrf},
-	  		error: function() {
-	  			updateWebshotImage(defaultImg, linkId);
-	  			updateWebshot(url, infoId, linkId, false);
-	  		},
-	  		success: function() {
-	      	updateWebshotImage(shotFile, linkId);
-	  		}
+	function checkWebshotExists(infoId, linkId) {
+		var links = [];
+		if (linkId) {
+			links[0] = $('#link-'+linkId);
+		} else {
+			$('.link-item').each(function() {
+				if ($(this).find('.link-info').text() === infoId)
+					links.push($(this));
 			});
 		}
+
+		links.forEach(function(item) {
+			
+			var embed = $(item).find('iframe').length;
+
+			if (!embed) {
+				var id = $(item).find('.link-id').text();
+				var shotFile = baseURL + '/webshots/' + infoId + '.jpg';
+				var defaultImg = baseURL + '/webshots/default.jpg';
+				var url = $(item).find('.link-href').text();
+
+				$.ajax({
+		    			url: shotFile,
+		    			type:'HEAD',
+		    			data: {_csrf: csrf},
+	  				error: function() {
+	  					updateWebshotImage(defaultImg, id);	 						
+						updateWebshot(url, infoId, id, false);
+ 					},
+	  				success: function() {
+	      					updateWebshotImage(shotFile, id);
+	  				}
+				});
+			}
+		});
 	}
 
 	function updateWebshotImage(shotFile, linkId) {
@@ -156,9 +174,12 @@ $(document).ready(function() {
 	}	
 
 	function updateWebshot(url, infoId, linkId, time) {
-		var webshotData = { url: url, linkId: linkId, infoId: infoId, time: time, _csrf: csrf };
+		var webshotData = { url: url, linkId: linkId, infoId: infoId, time: time };
 
-		$.post("/api/link/webshot", webshotData).done(function () {});
+		io.socket.get("/api/link/webshot", webshotData, function(resp) {
+			if (resp === 'done')
+				updateWebshotImage('webshots/' + infoId + '.jpg', linkId);
+		});
 
 		// $.post("/api/link/webshot", webshotData).done(function(response) {
 		// 	if (response === 'done')
@@ -634,7 +655,7 @@ $(document).ready(function() {
 	checkWebshotTime();
 
 	io.socket.on('webshotSock', function(data) {
-		checkWebshotExists(data.linkId, data.infoId);
+		updateWebshotImage('webshots/' + data.infoId + '.jpg', data.linkId);
 	});	
 
 	makeTagHovers();

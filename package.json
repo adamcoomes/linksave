@@ -46,7 +46,8 @@
     "url-title": "0.0.1",
     "url-to-title": "^1.0.3",
     "validator": "^3.18.1",
-    "webshot": "^0.15.3"
+    "webshot": "^0.15.3",
+    "short-mongo-id": "~0.1.1"
   },
   "scripts": {
     "start": "node app.js",

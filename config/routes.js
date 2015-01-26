@@ -57,11 +57,21 @@ module.exports.routes = {
   'get /auth/:provider': 'AuthController.provider',
   'get /auth/:provider/callback': 'AuthController.callback',
 
-  "r|^/(\\d+)$|id": {
+  '/p2icallback': {
     controller: 'link',
-    action: 'visit',
-    skipAssets: true
-  } 
+    action: 'webshotCallback'
+  },
+
+  '/v/:id': {
+    controller: 'link',
+    action: 'visit'
+  }
+
+//  "r|^/(\\d+)$|id": {
+//    controller: 'link',
+//    action: 'visit',
+//    skipAssets: true
+//  } 
   
   /***************************************************************************
   *                                                                          *

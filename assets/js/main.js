@@ -10,6 +10,9 @@ $(document).ready(function() {
 			  confirmButtonText: "Cool",
 			  closeOnConfirm: true
 			});
+
+			$('#tagButton').prop("disabled",false);
+			$("#unverified").remove();
 		}
 	});
 
@@ -17,6 +20,7 @@ $(document).ready(function() {
 	var done = false;
 	var csrf = '';
 	var baseURL = location.protocol + "//" + location.host;
+	var totalLinks = 0;
 
 	$.ajax({
 		type: 'GET',
@@ -73,6 +77,7 @@ $(document).ready(function() {
 			var links = results.links;
 
 			links.forEach(function(link) {
+				totalLinks++;
 				var id = link.id
 				var linkHTML = new EJS({url: '../../templates/link.ejs'}).render({link: link});
 
@@ -129,6 +134,7 @@ $(document).ready(function() {
 	if ($("#unverified").length) {
 		$("#alert-close").hide();
 		$(".alert").alert().show();
+		$('#tagButton').prop("disabled",true);		
 	}
 
 	function checkWebshotExists(infoId, linkId) {
@@ -476,17 +482,22 @@ $(document).ready(function() {
 					$('#link-' + editId).find('.link-title').text(result.title);
 					var tagelem = $('#link-' + editId).find('.link-tags');
 					var tagHTML = '';
-					
-					result.tags.forEach(function(tag) {
-						tagHTML += '<a class="tag-filter tag-link" href="#"><span class="tag-filter-id" style="display: none">' + tag.id + '</span>#<span class="tag-filter-name">' + tag.name + '</span>&nbsp;</a> ';
-					});
 
-					tagelem.html(tagHTML);
+					if (result.hasOwnProperty('tags')) {				
+						result.tags.forEach(function(tag) {
+							tagHTML += '<a class="tag-filter tag-link" href="#"><span class="tag-filter-id" style="display: none">' + tag.id + '</span>#<span class="tag-filter-name">' + tag.name + '</span>&nbsp;</a> ';
+						});
+
+						tagelem.html(tagHTML);		
+					}
+
+
+
 					$('#link-area').masonry('layout');
 
 					$('#link-edit-submit').button('reset');
 					$("#main-modal").modal('hide');
-					makeTags();
+					makeTags();	 			
 	 			
 	 			});
 			});
@@ -653,6 +664,9 @@ $(document).ready(function() {
 
 	loadLinks(false, true, page);
 	checkWebshotTime();
+	if ((!totalLinks) && (!($("#showVerify").length))) {
+		$('body').chardinJs('start');	
+	}	
 
 	io.socket.on('webshotSock', function(data) {
 		updateWebshotImage('webshots/' + data.infoId + '.jpg', data.linkId);
@@ -687,6 +701,19 @@ $(document).ready(function() {
 	$("#link-form").submit(function(e) {
 
 		e.preventDefault();
+	
+		if ($("#unverified").length) {
+			swal({
+			  title: "Sorry!",
+			  text: "You must confirm your email address before adding links.",
+			  type: "error",
+			  showCancelButton: false,
+			  confirmButtonText: "Got it",
+			  closeOnConfirm: true
+			});			
+			return false;
+		}
+
 		var url = $("#link-input").val();
 		var tags = [];
 
@@ -712,6 +739,8 @@ $(document).ready(function() {
 
 		$.get("/api/link/add", data).done(function(result) {
 
+			totalLinks++;
+
 			$('#addButton').button('reset');
 
 			if (result === 'error') {
@@ -719,7 +748,7 @@ $(document).ready(function() {
 				return false;
 			}
 
-			$("#link-input").val('');			
+			$("#link-input").val('');
 
 			var id = result.id;
 
@@ -741,6 +770,7 @@ $(document).ready(function() {
 
 			$('#link-area').masonry( 'prepended', $(".link-item").first() );
 			makeTags();
+
 		});
 	});
 });

@@ -19,9 +19,10 @@ var cssFilesToInject = [
   'styles/bootstrap-theme.min.css',
   'styles/font-awesome.min.css',
   'styles/slidebars.min.css',
-  'styles/sweet-alert.css',  
+  'styles/sweet-alert.css',
+  'styles/chardinjs.css',
   'styles/style.css',
-  'styles/bootstrap-social.css'  
+  'styles/bootstrap-social.css'
 ];
 
 

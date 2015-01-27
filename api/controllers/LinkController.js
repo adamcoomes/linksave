@@ -26,38 +26,40 @@ function takeWebshot(req, res, data) {
 	    'Content-Type':     'application/x-www-form-urlencoded'
 	}
 
-	var p2i_callback = 'https://linksave.com/p2icallback?id=' + data.id + '&link=' + data.linkId + '&s=' + encodeURIComponent(data.socketId);
+	if (!sails.config.environment === "development") {
+		var p2i_callback = 'https://linksave.com/p2icallback?id=' + data.id + '&link=' + data.linkId + '&s=' + encodeURIComponent(data.socketId);
 
-	var qs = {'p2i_url': data.url, p2i_key: '1cfc024d9cc62acd', p2i_size: '640x480', p2i_screen: '640x480', p2i_callback: p2i_callback};
+		var qs = {'p2i_url': data.url, p2i_key: '1cfc024d9cc62acd', p2i_size: '640x480', p2i_screen: '640x480', p2i_callback: p2i_callback};
 
-	if (data.checkTime) {
-		qs.p2i_refresh = 1;
-	}
-
-	// Configure the request
-	var options = {
-	    url: 'http://api.page2images.com/restfullink',
-	    method: 'GET',
-	    qs: qs
-	}
-
-	// Start the request
-	request(options, function (error, response, body) {
-	    if (!error && response.statusCode == 200) {
-		var json = JSON.parse(body);
-		if (json.hasOwnProperty('result')) {
-			console.log(json.result);
-			if (json.result === 'finished') {
-				res.send('done');
-				console.log('image already there');
-			}
+		if (data.checkTime) {
+			qs.p2i_refresh = 1;
 		}
-		else {
-			res.send('processing');
-			console.log('processing...');
-		} 
-	   }
-	}).end();
+
+		// Configure the request
+		var options = {
+		    url: 'http://api.page2images.com/restfullink',
+		    method: 'GET',
+		    qs: qs
+		}
+
+		// Start the request
+		request(options, function (error, response, body) {
+		    if (!error && response.statusCode == 200) {
+			var json = JSON.parse(body);
+			if (json.hasOwnProperty('result')) {
+				console.log(json.result);
+				if (json.result === 'finished') {
+					res.send('done');
+					console.log('image already there');
+				}
+			}
+			else {
+				res.send('processing');
+				console.log('processing...');
+			} 
+		   }
+		}).end();
+	}
 
 // var url = 'http://api.page2images.com/restfullink?p2i_url=' + data.url + '&p2i_key=1cfc024d9cc62acd&p2i_size=640x480&p2i_screen=640x480';
 
@@ -143,6 +145,12 @@ module.exports = {
 			res.end();
 		}
 
+		if (!req.user.verified) {
+			console.log('unverified');
+			res.send('unverified');
+			res.end();
+		}
+
 		var link = new Object();
 		var data = new Object();
 		var url = req.query.url;
@@ -162,14 +170,18 @@ module.exports = {
 				
 				else {
 					save.id = newlink.id;
-					var short = shortId(save.id);
-					save.shortid = short;
-                                        Link.update({id: save.id}, {shortid: short}, function(shortErr, shortResult) {
-                                        	if (shortErr)
-                                                	errors.log(shortErr, 'shortening link', save.id);
+					if (sails.config.environment != 'development') {
+						var short = shortId(save.id);
+						save.shortid = short;
+	          Link.update({id: save.id}, {shortid: short}, function(shortErr, shortResult) {
+  	        if (shortErr)
+    	      	errors.log(shortErr, 'shortening link', save.id);
 
-                                               	res.send(save);
-                                        });
+          		res.send(save);
+          	});
+					} else {
+						res.send(save);
+					}
 				}
 			});
 		};
@@ -250,6 +262,11 @@ module.exports = {
 			res.end();
 		}
 
+		if (!req.user.verified) {
+			res.end();
+		}
+
+
 		var link = new Object();
 		var id = req.body.id;
 		var title = req.body.title;
@@ -279,6 +296,10 @@ module.exports = {
 	},
 
 	webshot: function(req, res) {
+		if (!req.user.verified) {
+			res.end();
+		}
+
 		var id = req.param('infoId');
 		var filePath = 'webshots/' + id + '.jpg';
 		var filePathFull = 'assets/' + filePath;
@@ -512,7 +533,7 @@ module.exports = {
   getLatestLinks: function(req, res) {
     if (req.user) {
       if (req.user.admin) {
-        Link.find().sort({ id: 'desc' }).limit(10).populate('info').populate('user').populate('tags').exec(function(err, links) {
+        Link.find().sort({ createdAt: 'desc' }).limit(10).populate('info').populate('user').populate('tags').exec(function(err, links) {
           res.send(links);
         });
       } else {

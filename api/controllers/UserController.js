@@ -486,7 +486,7 @@ module.exports = {
   getLatestUsers: function(req, res) {
     if (req.user) {
       if (req.user.admin) {
-        User.find().sort({ createdAt: 'asc' }).limit(10).populate('passports').exec(function(err, users) {
+        User.find().sort({ createdAt: 'desc' }).limit(10).populate('passports').exec(function(err, users) {
           res.send(users);
         });
       } else {

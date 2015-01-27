@@ -16,6 +16,10 @@ module.exports = {
 			res.end();
 		}
 
+		if (!req.user.verified) {
+			res.end();
+		}		
+
 		var name = req.query.name;
 		var user = req.user;
 

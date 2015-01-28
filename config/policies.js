@@ -26,7 +26,46 @@ module.exports.policies = {
   *                                                                          *
   ***************************************************************************/
 
-   '*': [ 'passport' ]
+   '*': [ 'passport' ],
+   LinkController: {
+      index: false,
+      find: false
+    },
+
+   UserController: {
+      index: false,
+      find: false
+    },
+
+   AuthController: {
+      index: false,
+      find: false
+    },
+
+   FileController: {
+      index: false,
+      find: false
+    },
+
+   LinkdataController: {
+      index: false,
+      find: false
+    },
+
+   TagController: {
+      index: false,
+      find: false
+    },
+
+   VisitController: {
+      index: false,
+      find: false
+   },
+
+   ErrorlogController: {
+      index: false,
+      find: false
+   }  
 
   /***************************************************************************
   *                                                                          *

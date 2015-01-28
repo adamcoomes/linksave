@@ -26,7 +26,6 @@ function takeWebshot(req, res, data) {
 	    'Content-Type':     'application/x-www-form-urlencoded'
 	}
 
-	if (!sails.config.environment === "development") {
 		var p2i_callback = 'https://linksave.com/p2icallback?id=' + data.id + '&link=' + data.linkId + '&s=' + encodeURIComponent(data.socketId);
 
 		var qs = {'p2i_url': data.url, p2i_key: '1cfc024d9cc62acd', p2i_size: '640x480', p2i_screen: '640x480', p2i_callback: p2i_callback};
@@ -59,7 +58,6 @@ function takeWebshot(req, res, data) {
 			} 
 		   }
 		}).end();
-	}
 
 // var url = 'http://api.page2images.com/restfullink?p2i_url=' + data.url + '&p2i_key=1cfc024d9cc62acd&p2i_size=640x480&p2i_screen=640x480';
 

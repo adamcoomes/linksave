@@ -2,15 +2,16 @@
  * Globals
  */
  
- body {
-  background: url("/images/home_bg.jpg") top left no-repeat fixed;
-  min-width: 1200px;
-  width: 100%;
-  min-height: 100%;
-  margin: 0;
-  padding: 0;
-  background-color: rgb(47,47,47);
- }
+body {
+background: url("/images/home_bg.jpg") top left no-repeat fixed;
+min-width: 1200px;
+width: 100%;
+min-height: 100%;
+margin: 0;
+padding: 0;
+background-size: cover;
+background-color: rgb(47,47,47);
+}
 
 .main-wrapper {
   padding-top: 20px;    

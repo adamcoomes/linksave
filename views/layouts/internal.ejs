@@ -69,7 +69,7 @@
                     <li>
                       <ul>
                         <% for (var i=0; i<tags.length; i++) { %>
-                        <li><input type="checkbox" class="select-tags" name="tags" value="<%= tags[i].id %>"> #<span id="link-input-tag-<%= tags[i].id %>"><%= tags[i].name %></span></li>
+                        <li><input id="input-tag-<%= tags[i].id %>" type="checkbox" class="select-tags" name="tags" value="<%= tags[i].id %>"> #<span id="link-input-tag-<%= tags[i].id %>"><%= tags[i].name %></span></li>
                         <% } %>
                       </ul>
                     </li>

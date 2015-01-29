@@ -15,7 +15,7 @@
                     <div class="col-md-3">
                     <% var countrow = 1; %>
                     <% for (var i=0; i<tags.length; i++) { %>
-                      <input type="checkbox" class="edit-tags" name="tags" value="<%= tags[i].id %>" <%= tags[i].checked %>> <%= tags[i].name %><br />
+                      <input id="edit-tag-<%= tags[i].id %>" type="checkbox" class="edit-tags" name="tags" value="<%= tags[i].id %>" <%= tags[i].checked %>> <%= tags[i].name %><br />
                       <% if ((countrow % 40) === 0) { %></div></div><br /><div class="row edit-link-tag-row"><div class="col-md-3"><% } else if ((countrow % 10) === 0) { %></div><div class="col-md-3"><% } %>
                       <% countrow++; %>
                     <% } %>

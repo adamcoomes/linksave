@@ -429,34 +429,37 @@ $(document).ready(function() {
 		 		if(key == 13) {
 		  		if (!$(this).val())
 		  			return false;
-		  	
-		  		$(this).val();
 
 		  		var data = { name: $(this).val(), _csrf: csrf };
 
 		    	$.get("/api/tag/add", data).done(function(result) {
 		    		if (result) {
-		    			$("#link-input-tags ul").append('<li><input type="checkbox" class="select-tags" name="tags" value="'+result.id+'"> #'+result.name+'</li>');
- 										
-							var numCols = $(".edit-link-tag-row:last").find(".col-md-3").length;
-							var numRows = $(".edit-link-tag-row .col-md-3:last").find(".edit-tags").length;
+		    			if (!result.existed) {
+			    			$("#link-input-tags ul").append('<li><input type="checkbox" class="select-tags" name="tags" value="'+result.id+'"> #'+result.name+'</li>');
+	 										
+								var numCols = $(".edit-link-tag-row:last").find(".col-md-3").length;
+								var numRows = $(".edit-link-tag-row .col-md-3:last").find(".edit-tags").length;
 
-							if (numRows > 9) {
-								if (numCols === 4)
-									$("#edit-link-tag-area").append('<br /><div class="row edit-link-tag-row"></div>');
+								if (numRows > 9) {
+									if (numCols === 4)
+										$("#edit-link-tag-area").append('<br /><div class="row edit-link-tag-row"></div>');
 
-								$(".edit-link-tag-row:last").append('<div class="col-md-3"></div>');
+									$(".edit-link-tag-row:last").append('<div class="col-md-3"></div>');
+								}
+
+								$(".edit-link-tag-row:last .col-md-3:last").append('<input id="edit-tag-"' + result.id + '" type="checkbox" class="edit-tags" name="tags" value="' + result.id + '" checked> ' + result.name + '<br />');
+
+								var tagHTML = new EJS({url: '../../templates/tag.ejs'}).render({tag: result});
+								$("#tags-area").append(tagHTML);
+
+								makeTagHovers(result.id);
+							} else {
+								$("#edit-tag-"+result.id).prop('checked', true);
 							}
-
-							$(".edit-link-tag-row:last .col-md-3:last").append('<input type="checkbox" class="edit-tags" name="tags" value="' + result.id + '" checked> ' + result.name + '<br />');
-
-							var tagHTML = new EJS({url: '../../templates/tag.ejs'}).render({tag: result});
-							$("#tags-area").append(tagHTML);
-
-							makeTagHovers(result.id);
 						}
 		    	});
 
+		  		$(this).val('');
 		    	return false;  					
 				}
 			});
@@ -471,11 +474,32 @@ $(document).ready(function() {
 				data.title = $("#edit-title").val();
 				data.tags = [];
 				data._csrf = csrf;
+				var taginput = $("#edit-link-new-tag").val();
+				if (taginput.length) {
+
+					var tagdata = {name: taginput, _csrf: csrf};
+					$.ajax({type: 'GET', url: "/api/tag/add", data: tagdata, async: false}).done(function(result) {
+						if (result) {
+							if (!result.existed) {
+								$("#link-input-tags ul").append('<li><input type="checkbox" class="select-tags" name="tags" value="'+result.id+'"> #'+result.name+'</li>');
+						
+								var tagHTML = new EJS({url: '../../templates/tag.ejs'}).render({tag: result});
+								$("#tags-area").append(tagHTML);
+	
+								makeTagHovers(result.id);
+							}
+
+							data.tags.push(result.id);
+						}
+					});
+				}
 
 				$(".edit-tags").each(function() {
-					if ($(this).is(":checked"))
+					if ($(this).prop('checked'))
 						data.tags.push($(this).val());
 				});	
+
+				alert(JSON.stringify(data));
 
 				$.post("/api/link/edit", data).done(function(result) {
 
@@ -487,11 +511,9 @@ $(document).ready(function() {
 						result.tags.forEach(function(tag) {
 							tagHTML += '<a class="tag-filter tag-link" href="#"><span class="tag-filter-id" style="display: none">' + tag.id + '</span>#<span class="tag-filter-name">' + tag.name + '</span>&nbsp;</a> ';
 						});
-
-						tagelem.html(tagHTML);		
 					}
 
-
+					tagelem.html(tagHTML);
 
 					$('#link-area').masonry('layout');
 
@@ -650,14 +672,18 @@ $(document).ready(function() {
 
     	$.get("/api/tag/add", data).done(function(result) {
     		if (result) {
-    			$("#link-input-tags ul").append('<li><input type="checkbox" class="select-tags" name="tags" value="'+result.id+'"> #'+result.name+'</li>');
-    			var tagHTML = new EJS({url: '../../templates/tag.ejs'}).render({tag: result});
-					$("#tags-area").append(tagHTML);
-					$(inputbox).val('');
-					makeTagHovers(result.id);
+    			if(!result.existed) {
+	    			$("#link-input-tags ul").append('<li><input id="input-tag-"'+result.id+'" type="checkbox" class="select-tags" name="tags" value="'+result.id+'"> #'+result.name+'</li>');
+	    			var tagHTML = new EJS({url: '../../templates/tag.ejs'}).render({tag: result});
+						$("#tags-area").append(tagHTML);
+						makeTagHovers(result.id);
+					} else {
+						$("#input-tag-"+result.id).prop('checked', true);
+					}
 				}
     	});
 
+			$(inputbox).val('');
     	return false;  
   	}
 	});
@@ -720,10 +746,29 @@ $(document).ready(function() {
 		if (!url)
 			return false;
 
+		var taginput = $("#link-new-tag").val();
+		if (taginput.length) {
+			var tagdata = {name: taginput, _csrf: csrf};
+			$.ajax({type: 'GET', url: "/api/tag/add", data: tagdata, async: false}).done(function(result) {
+				if (result) {
+					if (!result.existed) {
+						$("#link-input-tags ul").append('<li><input type="checkbox" class="select-tags" name="tags" value="'+result.id+'"> #'+result.name+'</li>');
+				
+						var tagHTML = new EJS({url: '../../templates/tag.ejs'}).render({tag: result});
+						$("#tags-area").append(tagHTML);
+
+						makeTagHovers(result.id);
+					}
+
+					tags.push(result.id);
+				}
+			});
+		}		
+
 		$('#addButton').button('loading');
 
 		$(".select-tags").each(function() {
-			if ($(this).is(":checked"))
+			if ($(this).prop('checked'))
 				tags.push($(this).val());
 		});
 

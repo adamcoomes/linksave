@@ -34,8 +34,15 @@ module.exports = {
 					if (err)
 						errors.log(err, 'error adding tag ' + name, user.id);
 
-					res.send(tag);
+					var sendtag = _.clone(tag);
+					sendtag.existed = false;
+
+					res.send(sendtag);
 				});
+			} else {
+				var sendtag = _.clone(result);
+				sendtag.existed = true;
+				res.send(sendtag);
 			}
 		});
 	},

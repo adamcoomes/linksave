@@ -505,6 +505,9 @@ module.exports = {
 					res.redirect('/');
 					res.end();				
 				}
+			} else {
+				res.redirect('/');
+				res.end();				
 			}
 		});
 	},

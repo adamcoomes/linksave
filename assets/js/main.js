@@ -499,8 +499,6 @@ $(document).ready(function() {
 						data.tags.push($(this).val());
 				});	
 
-				alert(JSON.stringify(data));
-
 				$.post("/api/link/edit", data).done(function(result) {
 
 					$('#link-' + editId).find('.link-title').text(result.title);

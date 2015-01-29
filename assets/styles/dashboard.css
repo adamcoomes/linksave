@@ -3,6 +3,11 @@ body {
 	background-image: none;
 }
 
+#dashboard-area {
+	width: 98%;
+	margin-left: -50px;
+}
+
 .dashbox {
 	background-color: rgb(61,61,61);
 	color: #FFF;

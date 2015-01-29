@@ -466,48 +466,45 @@ module.exports = {
 		console.log(shortId);
 
 		Link.findOne({shortid: shortId}).populate('info').exec(function(err, link) {
-			if ((err) || (!link)) {
+			if ((!err) && (link)) {
+				if (link.hasOwnProperty('id')) {
+					if (link.id) {
+						var linkId = link.id;
+						url = link.info.url;
+						visits = link.visits;
+						visit.link = linkId;
+						visit.ip = req.connection.remoteAddress;
+						visit.referer = req.header('Referer');
+						visit.language = req.headers['accept-language'];
+						visit.browserName = agentData.browser.name;
+						visit.browserVersion = agentData.browser.version;
+						visit.osName = agentData.os.name;
+						visit.osVersion = agentData.os.version;
+						if (req.hasOwnProperty('user'))
+							visit.user = req.user;
+						else
+							visit.user = null;
+
+						Visit.create(visit).exec(function (err, data) {
+							visits+=1;
+							Link.update({id: linkId}, {visits: visits}, function(err, visitedLink) {
+								if (ajax)
+									res.send('done');
+								else {
+									res.redirect(url);
+									res.end();
+								}
+							});
+						});
+					}
+					else {
+						res.redirect('/');
+						res.end();
+					}			
+				} else {
 					res.redirect('/');
 					res.end();				
-			}
-
-			if (link.hasOwnProperty('id')) {
-				if (link.id) {
-					var linkId = link.id;
-					url = link.info.url;
-					visits = link.visits;
-					visit.link = linkId;
-					visit.ip = req.connection.remoteAddress;
-					visit.referer = req.header('Referer');
-					visit.language = req.headers['accept-language'];
-					visit.browserName = agentData.browser.name;
-					visit.browserVersion = agentData.browser.version;
-					visit.osName = agentData.os.name;
-					visit.osVersion = agentData.os.version;
-					if (req.hasOwnProperty('user'))
-						visit.user = req.user;
-					else
-						visit.user = null;
-
-					Visit.create(visit).exec(function (err, data) {
-						visits+=1;
-						Link.update({id: linkId}, {visits: visits}, function(err, visitedLink) {
-							if (ajax)
-								res.send('done');
-							else {
-								res.redirect(url);
-								res.end();
-							}
-						});
-					});
 				}
-				else {
-					res.redirect('/');
-					res.end();
-				}			
-			} else {
-				res.redirect('/');
-				res.end();				
 			}
 		});
 	},

@@ -452,7 +452,7 @@ module.exports = {
 	visit: function(req, res) {;
 		var shortId = req.param('id');
 		var host = req.headers['host'];
-		if (!shortId) {
+		if ((!shortId) || (shortId.length < 6)) {
 			res.redirect('/');
 			res.end();
 		}
@@ -466,6 +466,11 @@ module.exports = {
 		console.log(shortId);
 
 		Link.findOne({shortid: shortId}).populate('info').exec(function(err, link) {
+			if (err) {
+					res.redirect('/');
+					res.end();				
+			}
+
 			if (link.hasOwnProperty('id')) {
 				if (link.id) {
 					var linkId = link.id;

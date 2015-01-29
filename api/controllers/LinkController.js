@@ -466,7 +466,7 @@ module.exports = {
 		console.log(shortId);
 
 		Link.findOne({shortid: shortId}).populate('info').exec(function(err, link) {
-			if (err) {
+			if ((err) || (!link)) {
 					res.redirect('/');
 					res.end();				
 			}

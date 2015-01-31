@@ -451,19 +451,17 @@ module.exports = {
 
 	visit: function(req, res) {;
 		var shortId = req.param('id');
-		var host = req.headers['host'];
-		if ((!shortId) || (shortId.length < 6)) {
+		if (!shortId) {
 			res.redirect('/');
 			res.end();
 		}
+		var host = req.headers['host'];		
 		var visit = new Object();
 		var parser = new uaparser();
 		var agentData = parser.setUA(req.headers['user-agent']).getResult();
 		var ajax = req.param('ajax');
 		var url = '';
 		var visits = 0;
-
-		console.log(shortId);
 
 		Link.findOne({shortid: shortId}).populate('info').exec(function(err, link) {
 			if ((!err) && (link)) {

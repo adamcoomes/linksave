@@ -139,9 +139,13 @@ var AuthController = {
 
         if (req.body) {
           if (req.body.hasOwnProperty('remember')) {
-            var oneWeek = 1000 * 60 * 60 * 24 * 7;
-            req.session.cookie._expires = new Date(Date.now() + oneWeek);
-            req.session.cookie.originalMaxAge = oneWeek;
+            var oneMonth = 1000 * 60 * 60 * 24 * 30;
+            req.session.cookie._expires = new Date(Date.now() + oneMonth);
+            req.session.cookie.originalMaxAge = oneMonth;
+          } else {
+            var oneDay = 1000 * 60 * 60 * 24;
+            req.session.cookie._expires = new Date(Date.now() + oneDay);
+            req.session.cookie.originalMaxAge = oneDay;            
           }
         }
         

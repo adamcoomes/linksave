@@ -4,9 +4,12 @@ body {
 	width: 100%;
 }
 
+body::-webkit-scrollbar { width: 0 !important }
+
+
 #dashboard-area {
 	width: 95%;
-	margin: 0 0 0 -50px;
+	margin: 0;
 	padding: 0;
 }
 

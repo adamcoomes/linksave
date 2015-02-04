@@ -138,15 +138,18 @@ var AuthController = {
         if (loginErr) return tryAgain();
 
         if (req.body) {
+          var cookieTime = 0;
           if (req.body.hasOwnProperty('remember')) {
-            var oneMonth = 1000 * 60 * 60 * 24 * 30;
-            req.session.cookie._expires = new Date(Date.now() + oneMonth);
-            req.session.cookie.originalMaxAge = oneMonth;
+            cookieTime = 1000 * 60 * 60 * 24 * 30;
           } else {
-            var oneDay = 1000 * 60 * 60 * 24;
-            req.session.cookie._expires = new Date(Date.now() + oneDay);
-            req.session.cookie.originalMaxAge = oneDay;            
+            if (req.body.hasOwnProperty('identifier'))
+              cookieTime = 1000 * 60 * 60 * 24;
+            else
+              cookieTime = 1000 * 60 * 60 * 24 * 30;            
           }
+
+          req.session.cookie._expires = new Date(Date.now() + cookieTime);
+          req.session.cookie.originalMaxAge = cookieTime;
         }
         
         // user logged in message

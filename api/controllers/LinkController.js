@@ -346,7 +346,7 @@ module.exports = {
 					sails.sockets.emit(socketId, 'webshotSock', {linkId: linkId, infoId: infoId});
 					res.end();
 				});
-                        });	
+      });	
 		}
 	},
 

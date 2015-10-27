@@ -45,7 +45,7 @@ function takeWebshot(req, res, data) {
 		request(options, function (error, response, body) {
 		    if (!error && response.statusCode == 200) {
 			var json = JSON.parse(body);
-			if (json.hasOwnProperty('result')) {
+			if (json.result) {
 				console.log(json.result);
 				if (json.result === 'finished') {
 					res.send('done');
@@ -360,17 +360,19 @@ module.exports = {
 		var page = 0;
 		var limit = 10;
 
-		if (req.query.hasOwnProperty('page')) 
+		console.log(JSON.stringify(req.query));
+	
+		if (req.query.page) 
 			page = parseInt(req.query.page);		
 
-		if (req.query.hasOwnProperty('limit')) 
+		if (req.query.limit) 
 			limit = parseInt(req.query.limit);
 
 		var skip = page * limit;
 		var done = false;
 
 		if (req.user) {
-			if (!req.query.hasOwnProperty('tags')) {
+			if (!req.query.tags) {
 				Link.count({user: req.user.id}).exec(function(err, count) {
 					if ((skip + limit) >= count)
 						done = true;
@@ -465,45 +467,41 @@ module.exports = {
 
 		Link.findOne({shortid: shortId}).populate('info').exec(function(err, link) {
 			if ((!err) && (link)) {
-				if (link.hasOwnProperty('id')) {
-					if (link.id) {
-						var linkId = link.id;
-						url = link.info.url;
-						visits = link.visits;
-						visit.link = linkId;
-						visit.ip = req.connection.remoteAddress;
-						visit.referer = req.header('Referer');
-						visit.language = req.headers['accept-language'];
-						visit.browserName = agentData.browser.name;
-						visit.browserVersion = agentData.browser.version;
-						visit.osName = agentData.os.name;
-						visit.osVersion = agentData.os.version;
-						if (req.hasOwnProperty('user'))
-							visit.user = req.user;
-						else
-							visit.user = null;
+				if (link.id) {
+					var linkId = link.id;
+					url = link.info.url;
+					visits = link.visits;
+					visit.link = linkId;
+					visit.ip = req.connection.remoteAddress;
+					visit.referer = req.header('Referer');
+					visit.language = req.headers['accept-language'];
+					visit.browserName = agentData.browser.name;
+					visit.browserVersion = agentData.browser.version;
+					visit.osName = agentData.os.name;
+					visit.osVersion = agentData.os.version;
+					if (req.user)
+						visit.user = req.user;
+					else
+						visit.user = null;
 
-						Visit.create(visit).exec(function (err, data) {
-							visits+=1;
-							Link.update({id: linkId}, {visits: visits}, function(err, visitedLink) {
-								if (ajax)
-									res.send('done');
-								else {
-									res.redirect(url);
-									res.end();
-								}
-							});
+					Visit.create(visit).exec(function (err, data) {
+						visits+=1;
+						Link.update({id: linkId}, {visits: visits}, function(err, visitedLink) {
+							if (ajax)
+								res.send('done');
+							else {
+								res.redirect(url);
+								res.end();
+							}
 						});
-					}
-					else {
-						res.redirect('/');
-						res.end();
-					}			
-				} else {
-					res.redirect('/');
-					res.end();				
+					});
 				}
-			} else {
+				else {
+					res.redirect('/');
+					res.end();
+				} 
+			}
+			else {
 				res.redirect('/');
 				res.end();				
 			}

@@ -139,6 +139,7 @@ function addLink(res, vars) {
 		console.log('unverified');
 		res.send('unverified');
 		res.end();
+		return false;
 	}
 
 	var data = new Object();
@@ -150,6 +151,7 @@ function addLink(res, vars) {
 	if (!is_valid_url(url)) {
 		res.send('Error: Invalid URL');
 		res.end();
+		return false;
 	}
 
 	var lastChar = url.length - 1;

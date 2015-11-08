@@ -19,6 +19,7 @@ module.exports = {
     verified: { type: 'boolean', defaultsTo: false },
     verifyToken: { type: 'string' },
     resetToken: { type: 'string' },
+    apiKey: { type: 'string' },
     admin: { type: 'boolean', defaultsTo: false },
     links: { collection: 'link', via: 'user' },
     tags: { collection: 'tag', via: 'user' },

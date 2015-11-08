@@ -1,0 +1,70 @@
+<script type="text/javascript">
+
+alert('hi');
+return false;
+
+function slideDown() {
+    var div = document.getElementById('linksaveObject');
+    var curh = 0, finalh = 100;
+    var interval = setInterval(function() {
+      if (curh === finalh) {
+        clearInterval(interval);
+        return;
+      }
+
+      curh = curh + 5;
+      div.style.height = curh + 'px';
+    }, 1);
+}
+
+function slideUp() {
+    var div = document.getElementById('linksaveObject');
+    var curh = 100, finalh = 0;
+    var interval = setInterval(function() {
+      if (curh === finalh) {
+        clearInterval(interval);
+        return;
+      }
+
+      curh = curh - 5;
+      div.style.height = curh + 'px';
+    }, 1);
+}
+
+
+function addLink(url) {
+    var xmlhttp;
+    var resp;
+    var xmlurl = '/api/link/add?url=' + url + '&tags=';
+
+    if (window.XMLHttpRequest) {
+        // code for IE7+, Firefox, Chrome, Opera, Safari
+        xmlhttp = new XMLHttpRequest();
+    } else {
+        // code for IE6, IE5
+        xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+
+    xmlhttp.onreadystatechange = function() {
+        if (xmlhttp.readyState == XMLHttpRequest.DONE ) {
+           if(xmlhttp.status == 200){
+              resp = xmlhttp.responseText;
+           }
+           else if(xmlhttp.status == 400) {
+              resp = 'error';
+           }
+           else {
+              resp = 'error';
+           }
+        
+           slideDown();
+           setTimeout(slideUp, 4000);
+        }
+    }
+
+    xmlhttp.open("GET", xmlurl, true);
+    xmlhttp.send();
+}
+var url = encodeURI(document.getElementById("linksaveURL").innerHTML);
+addLink(url);
+</script>

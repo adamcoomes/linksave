@@ -13,12 +13,19 @@ module.exports = {
 				showVerify = true;
 			}
 
-			Tag.find({user: req.user.id}).exec(function (err, tags) {
+			Tag.find({user: req.user.id}).sort({ name: 'asc' }).populate('links').exec(function (err, tags) {
 				if (err)
 					errors.log(err, 'populating tags', req.user.id);
-				
+
+				var newtags = [];
+
+				tags.forEach(function(t) {
+					t.linknum = t.links.length;
+					newtags.push(t);
+				});
+
 				res.view('main/main', {
-					tags: tags,
+					tags: newtags,
 					showVerify: showVerify,
 					layout: 'layouts/internal'
 				});

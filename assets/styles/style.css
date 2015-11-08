@@ -190,13 +190,14 @@ a:hover {
 #tags-area {
   padding: 0;
   margin: 0 0 0 0px;
-  width: 90%;
+  width: 100%;
 }
 
 #menu-area .tag-list {
-  margin: 3px 0px 0px 0px;
+  margin: 3px 0px 3px 0px;
   padding: 5px 0 5px 0px;
   font-size: 16px;
+  width: 100%;
 }
 
 #menu-area .tag-list a {
@@ -208,10 +209,18 @@ a:hover {
   text-decoration: none;
 }
 
+.tag-filter-num {
+  float: right;
+  border: 1px solid #2c4b85;
+  background-color: #3d66b3;
+  padding: 0px 7px;
+  margin-right: 5px  
+}
+
 .tag-button {
   float: left;
   font-size: 10px;
-  margin: 5px 7px 0 0px;
+  margin: 5px 0px 2px 5px;
   visibility: hidden;
 }
 

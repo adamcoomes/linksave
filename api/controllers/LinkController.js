@@ -26,48 +26,48 @@ function takeWebshot(req, res, data) {
 	    'Content-Type':     'application/x-www-form-urlencoded'
 	}
 
-		var p2i_callback = 'https://linksave.com/p2icallback?id=' + data.id + '&link=' + data.linkId + '&s=' + encodeURIComponent(data.socketId);
+	var p2i_callback = 'https://linksave.com/p2icallback?id=' + data.id + '&link=' + data.linkId + '&s=' + encodeURIComponent(data.socketId);
 
-		var qs = {'p2i_url': data.url, p2i_key: '1cfc024d9cc62acd', p2i_size: '640x480', p2i_screen: '640x480', p2i_callback: p2i_callback};
+	var qs = {'p2i_url': data.url, p2i_key: '1cfc024d9cc62acd', p2i_size: '640x480', p2i_screen: '640x480', p2i_callback: p2i_callback};
 
-		if (data.checkTime) {
-			qs.p2i_refresh = 1;
-		}
+	if (data.checkTime) {
+		qs.p2i_refresh = 1;
+	}
 
-		// Configure the request
-		var options = {
-		    url: 'http://api.page2images.com/restfullink',
-		    method: 'GET',
-		    qs: qs
-		}
+	// Configure the request
+	var options = {
+	    url: 'http://api.page2images.com/restfullink',
+	    method: 'GET',
+	    qs: qs
+	}
 
-		// Start the request
-		request(options, function (error, response, body) {
-		    if (!error && response.statusCode == 200) {
-			var json = JSON.parse(body);
-			if (json.result) {
-				console.log(json.result);
-				if (json.result === 'finished') {
-					res.send('done');
-					console.log('image already there');
-				}
+	// Start the request
+	request(options, function (error, response, body) {
+	    if (!error && response.statusCode == 200) {
+		var json = JSON.parse(body);
+		if (json.result) {
+			console.log(json.result);
+			if (json.result === 'finished') {
+				res.send('done');
+				console.log('image already there');
 			}
-			else {
-				res.send('processing');
-				console.log('processing...');
-			} 
-		   }
-		}).end();
+		}
+		else {
+			res.send('processing');
+			console.log('processing...');
+		} 
+	   }
+	}).end();
 
-// var url = 'http://api.page2images.com/restfullink?p2i_url=' + data.url + '&p2i_key=1cfc024d9cc62acd&p2i_size=640x480&p2i_screen=640x480';
+	// var url = 'http://api.page2images.com/restfullink?p2i_url=' + data.url + '&p2i_key=1cfc024d9cc62acd&p2i_size=640x480&p2i_screen=640x480';
 
-// request
-//   .get(url)
-//   .on('response', function(response) {
-//     console.log(response.statusCode) // 200
-//     console.log(response.headers['content-type']) // 'image/png'
-//   });
-  // .pipe(request.put('http://mysite.com/img.png'))	
+	// request
+	//   .get(url)
+	//   .on('response', function(response) {
+	//     console.log(response.statusCode) // 200
+	//     console.log(response.headers['content-type']) // 'image/png'
+	//   });
+	  // .pipe(request.put('http://mysite.com/img.png'))	
   
 }
 
@@ -77,7 +77,7 @@ function updateWebshot(req, res, data) {
 			Linkdata.findOne(data.id).exec(function(err, linkdata) {
 				if (err)
 					errors.log(err, 'finding link data for webshot', '', data.id);
-				
+
 				var updated = new Date(linkdata.updatedAt);
 				data.updated = _.clone(updated);
 				var now = new Date();
@@ -129,6 +129,144 @@ function updateWebshot(req, res, data) {
 // 	});
 // }
 
+function is_valid_url(url) {
+	return url.match(/^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?$/i);
+}
+
+function addLink(res, vars) {
+
+	if (!vars.user.verified) {
+		console.log('unverified');
+		res.send('unverified');
+		res.end();
+	}
+
+	var data = new Object();
+	var url = vars.url;
+
+	if (!/^(ht|f)tps?:\/\//i.test(url))
+			url = 'http://' + url;		
+
+	if (!is_valid_url(url)) {
+		res.send('Error: Invalid URL');
+		res.end();
+	}
+
+	var lastChar = url.length - 1;
+	if(url.lastIndexOf('/') === lastChar)
+		url = url.substring(0, lastChar);		
+
+	function saveLink(link) {
+		var save = _.clone(link);
+
+		Link.create(link, function (err, newlink) {
+			if (err)
+				errors.log(err, 'saving link ' + url, vars.user.id);
+			
+			else {
+				save.id = newlink.id;
+				if (sails.config.environment != 'development') {
+					var short = shortId(save.id);
+					save.shortid = short;
+			        Link.update({id: save.id}, {shortid: short}, function(shortErr, shortResult) {
+				  	    if (shortErr)
+				    	    errors.log(shortErr, 'shortening link', save.id);
+
+				    	delete save.user;
+		          		res.send(save);
+		          		res.end();
+		          	});
+				} else {
+				    delete save.user;
+					res.send(save);
+					res.end();
+				}
+			}
+		});
+	};
+
+    function createLink(info) {
+    	var link = new Object();
+    	link.info = info;
+    	link.user = vars.user;
+    	var tags = vars.tags;
+		link.tags = [];
+    	link.title = info.title;			
+		link.slug = link.title.replace(/\s+/g, '-').toLowerCase();
+		link.visits = 0;
+		link.saves = 0;
+
+
+		if ((info.url.indexOf('youtube.com') >= 0) || (info.url.indexOf('vimeo.com') >= 0))
+			link.embed = embed(info.url);
+
+		if(tags) {
+			var tagcount = 0;
+			tags.forEach(function(tag) {
+				Tag.findOne(tag).exec(function (err, foundTag) {
+					if (err)
+						errors.log(err, 'when adding link, finding tag ' + tag, link.user.id);		
+
+					if (foundTag)
+						link.tags.push(foundTag);
+					else
+						link.tags.push({id: foundTag.id, name: foundTag.name});
+
+					tagcount++;
+
+					if (tagcount === tags.length) {
+						saveLink(link);
+					}
+				});
+			});
+		} else {
+			saveLink(link);
+		}
+    };
+
+	Linkdata.findOne({url: url}).exec(function(err, foundData) {
+		if (err)
+			errors.log(err, 'finding link data for ' + url, vars.user.id);	
+
+		if (foundData) {
+			Link.findOne({user: vars.user.id, info: foundData.id}).exec(function (err, matchlink) {
+				if (matchlink) {
+					res.send('exists');
+			        res.end();				
+				} else {
+					createLink(foundData);
+				}
+			});					
+		} else {
+			data.url = url;
+			data.favicon = 'https://www.google.com/s2/favicons?domain=' + url;
+
+			console.log(JSON.stringify(data));
+			console.log(url);
+
+			urltotitle(url, function(urlerr, title) {
+					if(!urlerr) {
+					if ((title) && (title != url))
+						data.title = title;
+					else
+						data.title = urltitle(url);
+			  
+					Linkdata.create(data).exec(function(dataerr, result) {
+						if (dataerr)
+							errors.log(dataerr, 'adding link data for ' + url, vars.user.id);
+
+                        createLink(result);
+					});
+				} else {
+			  		res.send("ERROR: " + urlerr);
+			  		errors.log(urlerr, 'parsing title from url', vars.user.id);
+				}
+			});
+		}
+	});
+}
+
+
 module.exports = {
 
 	// test1: function(req, res) {
@@ -138,119 +276,45 @@ module.exports = {
 
 	add: function(req, res) {
 
+		var vars = new Object();
+		vars.url = req.query.url;
+		vars.tags = req.query.tags;
+
 		if (!req.user) {
-			res.redirect('/');
-			res.end();
-		}
+			if (req.query.key) {
+				var apiKey = req.query.key;
+				User.findOne({apiKey: apiKey}).exec(function (err, result) {
+		          if (err)
+		            errors.log(err, 'checking if api key ' + apiKey + ' exists');
 
-		if (!req.user.verified) {
-			console.log('unverified');
-			res.send('unverified');
-			res.end();
-		}
-
-		var link = new Object();
-		var data = new Object();
-		var url = req.query.url;
-		var tags = req.query.tags;
-		link.user = req.user;
-
-		var lastChar = url.length - 1;
-		if(url.lastIndexOf('/') === lastChar)
-    	url = url.substring(0, lastChar);		
-
-		function saveLink(link) {
-			var save = _.clone(link);
-
-			Link.create(link, function (err, newlink) {
-				if (err)
-					errors.log(err, 'saving link ' + link.url, req.user.id);
-				
-				else {
-					save.id = newlink.id;
-					if (sails.config.environment != 'development') {
-						var short = shortId(save.id);
-						save.shortid = short;
-	          Link.update({id: save.id}, {shortid: short}, function(shortErr, shortResult) {
-  	        if (shortErr)
-    	      	errors.log(shortErr, 'shortening link', save.id);
-
-          		res.send(save);
-          	});
-					} else {
-						res.send(save);
-					}
-				}
-			});
-		};
-
-    function addLink(info) {
-    	link.info = info;
-			link.tags = [];
-    	link.title = info.title;			
-			link.slug = link.title.replace(/\s+/g, '-').toLowerCase();
-			link.visits = 0;
-			link.saves = 0;
-
-			if ((info.url.indexOf('youtube.com') >= 0) || (info.url.indexOf('vimeo.com') >= 0))
-				link.embed = embed(info.url);
-
-			if(tags) {
-				var tagcount = 0;
-				tags.forEach(function(tag) {
-					Tag.findOne(tag).exec(function (err, foundTag) {
-						if (err)
-							errors.log(err, 'when adding link, finding tag ' + tag, req.user.id);		
-
-						if (foundTag)
-							link.tags.push(foundTag);
-						else
-							link.tags.push({id: foundTag.id, name: foundTag.name});
-
-						tagcount++;
-
-						if (tagcount === tags.length) {
-							saveLink(link);
-						}
-
-					});
+		          if (!result) {
+					res.redirect('/');
+					res.end();
+		          } else {
+		          	vars.user = result;
+		          	addLink(res, vars);
+		          }
 				});
 			} else {
-				saveLink(link);
+				res.redirect('/');
+				res.end();
 			}
-    };
+		} else {
+			vars.user = req.user;
+			addLink(res, vars);			
+		}
+	},
 
-		Linkdata.findOne({url: url}).exec(function(err, foundData) {
-			if (err)
-				errors.log(err, 'finding link data for ' + url, req.user.id);		
+	bookmarklet: function(req, res) {
+		var vars = new Object();
+		vars.user = req.user;
+		vars.url = req.param('url');
+		vars.tags = [];
 
-			if (foundData) {
-				addLink(foundData);
-			}
-			else {
-				data.url = url;
-				data.favicon = 'https://www.google.com/s2/favicons?domain=' + url;
-
-				urltotitle(url, function(err, title) {
-				  if(!err) {
-						if ((title) && (title != url))
-							data.title = title;
-						else
-							data.title = urltitle(url);
-				  
-						Linkdata.create(data).exec(function(dataerr, result) {
-							if (dataerr)
-								errors.log(dataerr, 'adding link data for ' + url, req.user.id);
-	
-                                                	addLink(result);
-						});
-				  } else {
-				  	res.send('error');
-				  	errors.log(err, 'parsing title from url', req.user.id);
-				  }
-				});
-			}
-		});
+		res.view ('bookmarklet', {
+			layout: 'layouts/bookmarklet',
+			vars: vars
+		});		
 	},
 
 	edit: function(req, res) {
@@ -303,8 +367,6 @@ module.exports = {
 		var filePathFull = 'assets/' + filePath;
 		var time = req.param('time');
 		var socketId = sails.sockets.id(req.socket);
-		//sails.sockets.join(req.socket, id);
-			
 
 		if (!time)
 			time = false;
@@ -346,7 +408,7 @@ module.exports = {
 					sails.sockets.emit(socketId, 'webshotSock', {linkId: linkId, infoId: infoId});
 					res.end();
 				});
-      });	
+      		});	
 		}
 	},
 
@@ -508,43 +570,43 @@ module.exports = {
 		});
 	},
 
- getLinkCount: function(req, res) {
-    if (req.user) {
-      if (req.user.admin) {
-        var linkCount = new Object();
-        var yesterday = new Date();
-        yesterday.setDate(yesterday.getDate()-1);
-        Link.count().exec(function(err, result) {
-          linkCount.total = result;
-          Link.count({ createdAt: { '>=': yesterday }}).exec(function(err, today) {
-            if (!today)
-              today = 0;
+	 getLinkCount: function(req, res) {
+	    if (req.user) {
+	      if (req.user.admin) {
+	        var linkCount = new Object();
+	        var yesterday = new Date();
+	        yesterday.setDate(yesterday.getDate()-1);
+	        Link.count().exec(function(err, result) {
+	          linkCount.total = result;
+	          Link.count({ createdAt: { '>=': yesterday }}).exec(function(err, today) {
+	            if (!today)
+	              today = 0;
 
-            linkCount.today = today;
-            res.send(linkCount);
-          })
-        });
-      } else {
-        res.send('access denied');
-      }
-    } else {
-      res.send('access denied');
-    }
-  },
+	            linkCount.today = today;
+	            res.send(linkCount);
+	          })
+	        });
+	      } else {
+	        res.send('access denied');
+	      }
+	    } else {
+	      res.send('access denied');
+	    }
+	},
 
-  getLatestLinks: function(req, res) {
-    if (req.user) {
-      if (req.user.admin) {
-        Link.find().sort({ createdAt: 'desc' }).limit(10).populate('info').populate('user').populate('tags').exec(function(err, links) {
-          res.send(links);
-        });
-      } else {
-        res.send('access denied');
-      }
-    } else {
-      res.send('access denied');
-    }
-  },	
+	getLatestLinks: function(req, res) {
+	    if (req.user) {
+	      if (req.user.admin) {
+	        Link.find().sort({ createdAt: 'desc' }).limit(10).populate('info').populate('user').populate('tags').exec(function(err, links) {
+	          res.send(links);
+	        });
+	      } else {
+	        res.send('access denied');
+	      }
+	    } else {
+	      res.send('access denied');
+	    }
+	},	
 
 	remove: function(req, res) {
 		if (!req.user) {
@@ -562,6 +624,13 @@ module.exports = {
 	},
 
 	//REMOVE THIS BEFORE PRODUCTION
+
+	list: function(req, res) {
+		Link.find().populate('info').populate('tags').exec(function(err, links) {
+			res.send(links);
+		});
+	}
+
 
 	// destroyAll: function(req, res) {
 	// 	Link.destroy({ id: { '>': 1 }}, function(err, result) {

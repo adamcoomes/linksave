@@ -19,7 +19,6 @@ $(document).ready(function() {
 	var page = 0;
 	var done = false;
 	var csrf = '';
-	var baseURL = location.protocol + "//" + location.host;
 	var totalLinks = 0;
 
 	$.ajax({
@@ -92,10 +91,10 @@ $(document).ready(function() {
 
 				if (link.embed)
 					$('#link-' + id).find(".link-webshot").html(link.embed);
-				//else
-					//checkWebshotExists(link.info.id, id);				
 				else
-					makeZoomable(id);
+					checkWebshotExists(link.info.id, id);				
+				//else
+					//makeZoomable(id);
 			});
 
 			if (layout) {
@@ -154,20 +153,20 @@ $(document).ready(function() {
 
 			if (!embed) {
 				var id = $(item).find('.link-id').text();
-				var shotFile = baseURL + '/webshots/' + infoId + '.jpg';
-				var defaultImg = baseURL + '/webshots/default.jpg';
+				var shotFile = 'webshots/' + infoId + '.jpg';
+				var defaultImg = 'webshots/default.jpg';
 				var url = $(item).find('.link-href').text();
 
 				$.ajax({
-		    			url: shotFile,
-		    			type:'HEAD',
-		    			data: {_csrf: csrf},
+		    		url: shotFile,
+		    		type:'HEAD',
+		    		data: {_csrf: csrf},
 	  				error: function() {
 	  					updateWebshotImage(defaultImg, id);	 						
 						updateWebshot(url, infoId, id, false);
  					},
 	  				success: function() {
-	      					updateWebshotImage(shotFile, id);
+	      				updateWebshotImage(shotFile, id);
 	  				}
 				});
 			}
@@ -240,7 +239,7 @@ $(document).ready(function() {
 	}
 
 	function is_valid_url(url) {
-    return url.match(/^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?$/i);
+    	return url.match(/^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!10(?:\.\d{1,3}){3})(?!127(?:\.\d{1,3}){3})(?!169\.254(?:\.\d{1,3}){2})(?!192\.168(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]+-?)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:\/[^\s]*)?$/i);
 	}
 
 	function trimText(text, trimNum) {
@@ -415,10 +414,11 @@ $(document).ready(function() {
 					var tagId = $(this).find('.tag-filter-id').text();
 					var tagName = $(this).find('.tag-filter-name').text();
 					var checked = '';
-					if (currentTags.indexOf(tagId) != '-1')
+					if (currentTags.indexOf(tagId) != '-1') {
 						checked = 'checked';
+					}
 
-					tags.push({id: tagId, name: tagName, checked: checked})
+					tags.push({id: tagId, name: tagName, checked: checked});
 			});
 
 			var editHTML = new EJS({url: '../../templates/linkedit.ejs'}).render({link: edit, tags: tags});
@@ -495,8 +495,29 @@ $(document).ready(function() {
 				}
 
 				$(".edit-tags").each(function() {
-					if ($(this).prop('checked'))
+					var tagId = $(this).val();
+					var tagNum = parseInt($("#tag-list-"+tagId).find(".tag-filter-num").text());
+					var findTag = $.grep(tags, function(e){ return e.id == tagId });	
+					
+					if ($(this).prop('checked')) {
 						data.tags.push($(this).val());
+						if (findTag.length) {
+							if (!findTag[0].checked){
+								tagNum = tagNum + 1;
+								$("#tag-list-"+tagId).find(".tag-filter-num").text(tagNum);
+							}
+						} else {
+							tagNum = tagNum + 1;
+							$("#tag-list-"+tagId).find(".tag-filter-num").text(tagNum);							
+						}
+					} else {
+						if (findTag.length) {
+							if (findTag[0].checked){
+								tagNum = tagNum - 1;
+								$("#tag-list-"+tagId).find(".tag-filter-num").text(tagNum);
+							}
+						}
+					}
 				});	
 
 				$.post("/api/link/edit", data).done(function(result) {
@@ -766,8 +787,14 @@ $(document).ready(function() {
 		$('#addButton').button('loading');
 
 		$(".select-tags").each(function() {
-			if ($(this).prop('checked'))
+			var tagId = $(this).val();			
+			var tagNum = 0;
+
+			if ($(this).prop('checked')){
 				tags.push($(this).val());
+				tagNum = parseInt($("#tag-list-"+tagId).find(".tag-filter-num").text()) + 1;	
+				$("#tag-list-"+tagId).find(".tag-filter-num").text(tagNum);
+			}
 		});
 
 		if (!/^(ht|f)tps?:\/\//i.test(url))
@@ -789,6 +816,9 @@ $(document).ready(function() {
 			if (result === 'error') {
 				swal("Error", "This link could not be saved. Check to make sure the URL is working.", "error");
 				return false;
+			} else if (result === 'exists') {
+				swal("Error", "You have already added this link.", "error");
+				return false;				
 			}
 
 			$("#link-input").val('');

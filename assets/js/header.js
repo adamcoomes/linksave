@@ -140,6 +140,12 @@ $(document).ready(function() {
 				});
 			});
 
+			$("#make-apikey").click(function(e) {
+				$.get('/api/user/apiKey', {_csrf: csrf}).done(function(result) {
+					$("#edit-apikey").val(result);
+				});
+			});
+
 			$("#profile-edit-form").submit(function(e) {
 				e.preventDefault();
 				

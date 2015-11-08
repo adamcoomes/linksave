@@ -15,7 +15,7 @@ module.exports = {
   	title: { type: 'string' },
   	slug: { type: 'string' },
   	favicon: { type: 'string' },
-  	links: { collection: 'link', via: 'info' }
+  	links: { collection: 'link', via: 'info' },
   }
 };
 

@@ -60,6 +60,25 @@ module.exports = {
     });
   },
 
+  apiKey: function(req, res) {
+    if (!req.user) {
+      res.redirect('/');
+      res.end();      
+    }
+
+    var user = req.user;
+    var key = utils.randomString(30);
+    User.update({id: user.id}, {apiKey: key}, function(err, u) {
+      if (err) {
+        errors.log(err, 'generating key', user.id);
+        res.send('error');
+      }
+      else {
+        res.send(key);
+      }
+    }); 
+  },
+
   checkUsername: function(req, res) {
     var user = req.user;
     var username = req.query.username;
@@ -82,7 +101,7 @@ module.exports = {
     var email = req.query.email;
 
     if (req.hasOwnProperty('user'))
-	user = req.user;
+	  user = req.user;
 
     if (((user.hasOwnProperty('id') && user.email != email)) || (!user.hasOwnProperty('id'))) {
       User.findOne({email: email}).exec(function(err, result) {

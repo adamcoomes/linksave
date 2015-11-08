@@ -627,11 +627,11 @@ module.exports = {
 
 	//REMOVE THIS BEFORE PRODUCTION
 
-	list: function(req, res) {
-		Link.find().populate('info').populate('tags').exec(function(err, links) {
-			res.send(links);
-		});
-	}
+	// list: function(req, res) {
+	// 	Link.find().populate('info').populate('tags').exec(function(err, links) {
+	// 		res.send(links);
+	// 	});
+	// }
 
 
 	// destroyAll: function(req, res) {

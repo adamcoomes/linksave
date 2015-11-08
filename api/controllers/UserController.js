@@ -60,24 +60,24 @@ module.exports = {
     });
   },
 
-  apiKey: function(req, res) {
-    if (!req.user) {
-      res.redirect('/');
-      res.end();      
-    }
+  // apiKey: function(req, res) {
+  //   if (!req.user) {
+  //     res.redirect('/');
+  //     res.end();      
+  //   }
 
-    var user = req.user;
-    var key = utils.randomString(30);
-    User.update({id: user.id}, {apiKey: key}, function(err, u) {
-      if (err) {
-        errors.log(err, 'generating key', user.id);
-        res.send('error');
-      }
-      else {
-        res.send(key);
-      }
-    }); 
-  },
+  //   var user = req.user;
+  //   var key = utils.randomString(30);
+  //   User.update({id: user.id}, {apiKey: key}, function(err, u) {
+  //     if (err) {
+  //       errors.log(err, 'generating key', user.id);
+  //       res.send('error');
+  //     }
+  //     else {
+  //       res.send(key);
+  //     }
+  //   }); 
+  // },
 
   checkUsername: function(req, res) {
     var user = req.user;

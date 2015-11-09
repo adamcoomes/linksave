@@ -19,6 +19,8 @@ errors.setController('link');
 function takeWebshot(req, res, data) {
 
 	console.log(JSON.stringify(data));
+	if (!data.socketId)
+		return false;
 
 	// Set the headers
 	var headers = {

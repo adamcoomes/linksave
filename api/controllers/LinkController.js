@@ -410,7 +410,7 @@ module.exports = {
 				tmpfile.on('finish', function() {
 					console.log('done');
 
-					var subscribers = sails.sockets.subscribers('webshotSock');
+					var subscribers = sails.sockets.subscribers();
 					console.log(subscribers);
 					if (subscribers.indexOf(socketId) > -1)
 						sails.sockets.emit(socketId, 'webshotSock', {linkId: linkId, infoId: infoId});

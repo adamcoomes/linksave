@@ -409,7 +409,13 @@ module.exports = {
 				fs.createReadStream(pathFull).pipe(tmpfile);
 				tmpfile.on('finish', function() {
 					console.log('done');
-					sails.sockets.emit(socketId, 'webshotSock', {linkId: linkId, infoId: infoId});
+
+					var subscribers = sails.sockets.subscribers('webshotSock');
+					if (subscribers.indexOf(socketId) > -1)
+						sails.sockets.emit(socketId, 'webshotSock', {linkId: linkId, infoId: infoId});
+					else
+						console.log('Socket Not Active');
+
 					res.end();
 				});
       		});	

@@ -411,6 +411,7 @@ module.exports = {
 					console.log('done');
 
 					var subscribers = sails.sockets.subscribers('webshotSock');
+					console.log(subscribers);
 					if (subscribers.indexOf(socketId) > -1)
 						sails.sockets.emit(socketId, 'webshotSock', {linkId: linkId, infoId: infoId});
 					else

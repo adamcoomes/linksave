@@ -410,10 +410,15 @@ module.exports = {
 				tmpfile.on('finish', function() {
 					console.log('done');
 
+					var socketTest = sails.sockets.id(socketId);
+					if (socketTest) {
+  						sails.sockets.emit(socketId, 'webshotSock', {linkId: linkId, infoId: infoId});
+					}
+
 					// var subscribers = sails.sockets.subscribers();
 					// console.log(subscribers);
 					// if (subscribers.indexOf(socketId) > -1)
-						sails.sockets.emit(socketId, 'webshotSock', {linkId: linkId, infoId: infoId});
+						
 					// else
 					// 	console.log('Socket Not Active');
 

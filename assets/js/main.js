@@ -712,7 +712,7 @@ $(document).ready(function() {
 	if ((!totalLinks) && (!($("#showVerify").length))) {
 		$('body').chardinJs('start');	
 	}	
-
+	
 	io.socket.on('webshotSock', function(data) {
 		updateWebshotImage('webshots/' + data.infoId + '.jpg', data.linkId);
 	});	

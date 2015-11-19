@@ -22,15 +22,6 @@ module.exports.sockets = {
   *                                                                          *
   ***************************************************************************/
 
-  beforeConnect: function (handshake, cb) {
-    // Be sure to call the callback
-    if (!sails.connectedSockets)
-      sails.connectedSockets = [1];
-
-    console.log(JSON.stringify(sails.connectedSockets));
-
-    return cb(null, true);
-  },
 
   /***************************************************************************
   *                                                                          *
@@ -43,9 +34,9 @@ module.exports.sockets = {
     console.log("socket disconnected");
     var socketId = sails.sockets.id(socket);
     console.log(socketId);
-    var index = sails.connectedSockets.indexOf(socketId);
-    sails.connectedSockets.splice(index, 1);
-    console.log(JSON.stringify(sails.connectedSockets));
+    var index = sails.config.globalVars.connectedSockets.indexOf(socketId);
+    sails.config.globalVars.connectedSockets.splice(index, 1);
+    console.log(JSON.stringify(sails.config.globalVars.connectedSockets));
     return cb();
   }
 

@@ -381,7 +381,9 @@ module.exports = {
 			if (exists)
 				webshotData.exists = true;
 
-			sails.config.globalVars.connectedSockets.push(socketId);
+			if (sails.config.globalVars.connectedSockets.indexOf(socketId) == -1) {
+				sails.config.globalVars.connectedSockets.push(socketId)
+			}
 			updateWebshot(req, res, webshotData);
 		});
 	},

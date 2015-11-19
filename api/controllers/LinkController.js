@@ -411,7 +411,7 @@ module.exports = {
 				tmpfile.on('finish', function() {
 					console.log('done');
 
-					if (sails.connectedSockets.indexOf(socketId) > -1)
+					if (sails.connectedSockets.indexOf(socketId) > -1) {
   						sails.sockets.emit(socketId, 'webshotSock', {linkId: linkId, infoId: infoId});
 					}
 

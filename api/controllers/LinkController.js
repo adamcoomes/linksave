@@ -84,7 +84,7 @@ function updateWebshot(req, res, data) {
 				data.updated = _.clone(updated);
 				var now = new Date();
 				var sinceUpdate = parseInt(now.valueOf()) - parseInt(updated.valueOf());
-				var checkAgainst = 1000 * 60 * 24 * 30;
+				var checkAgainst = 1000 * 60 * 60 * 24 * 30;
 
 				if (sinceUpdate > checkAgainst) {
 					Linkdata.update({id: data.id}, {updatedAt: now}, function(err, updated){});

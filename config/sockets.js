@@ -36,7 +36,7 @@ module.exports.sockets = {
     console.log(socketId);
     var index = sails.config.globalVars.connectedSockets.indexOf(socketId);
     sails.config.globalVars.connectedSockets.splice(index, 1);
-    console.log(JSON.stringify(sails.config.globalVars.connectedSockets));
+//  console.log(JSON.stringify(sails.config.globalVars.connectedSockets));
     return cb();
   }
 

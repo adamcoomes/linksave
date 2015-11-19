@@ -25,7 +25,9 @@ module.exports.sockets = {
   beforeConnect: function (handshake, cb) {
     // Be sure to call the callback
     if (!sails.connectedSockets)
-      sails.connectedSockets = [];
+      sails.connectedSockets = [1];
+
+    console.log(JSON.stringify(sails.connectedSockets));
 
     return cb(null, true);
   },

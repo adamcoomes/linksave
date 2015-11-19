@@ -381,6 +381,7 @@ module.exports = {
 			if (exists)
 				webshotData.exists = true;
 
+			sails.connectedSockets.push(socketId);
 			updateWebshot(req, res, webshotData);
 		});
 	},
@@ -410,8 +411,7 @@ module.exports = {
 				tmpfile.on('finish', function() {
 					console.log('done');
 
-					var socketTest = sails.sockets.id(socketId);
-					if (socketTest) {
+					if (sails.connectedSockets.indexOf(socketId) > -1)
   						sails.sockets.emit(socketId, 'webshotSock', {linkId: linkId, infoId: infoId});
 					}
 

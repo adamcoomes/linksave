@@ -32,7 +32,11 @@ module.exports.sockets = {
   afterDisconnect: function (session, socket, cb) {
     // Be sure to call the callback
     console.log("socket disconnected");
-    console.log(sails.sockets.id(socket));
+    var socketId = sails.sockets.id(socket);
+    console.log(socketId);
+    var index = sails.connectedSockets.indexOf(socketId);
+    sails.connectedSockets.splice(index, 1);
+    console.log(JSON.stringify(sails.connectedSockets));
     return cb();
   }
 
